@@ -18,7 +18,7 @@ public class Process {
 
     
     public void loadTextures() {
-        game.setup();
+        game.Setup();
         
     }
 
@@ -30,16 +30,16 @@ public class Process {
         // Raylib.DrawText( "Funcionou!", 300, 200, 30, Color.White );
 
 
-        game.update( delta );
+        game.Update( delta );
 
         if( Raylib.IsWindowResized() ) {
-            game.resizeWindow();
+            game.ResizeWindow();
         }
 
     }
 
     public void end() {
-        game.finish();
+        game.Finish();
     }
       
 

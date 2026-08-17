@@ -1,4 +1,5 @@
 using Raylib_cs;
+using Umbrage.Jitter;
 
 namespace Umbrage;
 
@@ -7,17 +8,17 @@ public class Game {
     private int innerWidth  = 0;
     private int innerHeight = 0;
 
-    Map map;
+    private Map Map = new();
 
     public Game() {
-        map = new Map( this );
+        
     }
     
 
-    public void setup() {
+    public void Setup() {
 
         Raylib.DisableCursor();
-        resizeWindow();
+        ResizeWindow();
 
         //string path = Directory.GetCurrentDirectory() + "/Assets/placeholder.png";
         // spritesheet = Raylib.LoadTexture( path );
@@ -26,29 +27,24 @@ public class Game {
     }
 
 
-    public void resizeWindow() {
+    public void ResizeWindow() {
         innerWidth  = Raylib.GetScreenWidth();
         innerHeight = Raylib.GetScreenHeight();
         // cam.Offset  = new Vector2( innerWidth / 2 , innerHeight / 2 );
     }
 
 
-    public void finish() {
+    public void Finish() {
 
         /// Raylib.UnloadTexture( spritesheet );
 
     }
 
-    public void update( float delta ) {
+    public void Update( float delta ) {
         
         Raylib.ClearBackground( new Color( 20, 20, 50 ) );
 
-        //Raylib.DrawText( "Hello, World!", innerWidth / 2, innerHeight / 2, 20, Color.Purple );
-        Raylib.BeginMode3D( map.player.camera );
-
-        map.update( delta );
-
-        Raylib.EndMode3D();
+        Map.Update( delta );
 
     }
 
