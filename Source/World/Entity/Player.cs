@@ -1,32 +1,27 @@
 using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.Intrinsics.X86;
 using Raylib_cs;
-using Umbrage.Utils;
-using Umbrage.World.Object;
+using Umbrage.Controllers;
 
 namespace Umbrage.World.Entity;
 
-public class Player : PhysicalObject {
-    public delegate void ConfigPlayer( Player player );
+public class Player: GenericEntity {
     
-    // -------------------------------------- Variables -------------------------------------- \\
-    public Camera3D camera;
-    public float yaw;
-    public float pitch;
-    
-    private Vector3 cameraAnchor = new();
-    // -------------------------------------- Getter -------------------------------------- \\
-    public Vector3 getCameraAnchor() { return cameraAnchor; }
+    public float Yaw   = 0;
+    public float Pitch = 0;
 
-    // -------------------------------------- Setter -------------------------------------- \\
-    public Player setCameraAnchor( Vector3 v ) { cameraAnchor = v;  return this; }
+    public Camera3D Camera;
+    public Vector3 Momentum = new();
+    public Vector3 Movement = new();
 
+    public Player( Map map  ): base( map ) {
+        
+        PlayerController pc = PlayerController.CreateInstance( this );
 
-    // -------------------------------------- Main -------------------------------------- \\
-    public Player( Game game ) : base( game ) {
-
-        camera = new Camera3D(
-            position,
-            position + Vector3.UnitZ,
+        Camera = new Camera3D(
+            Position,
+            Position + Vector3.UnitZ,
             Vector3.UnitY,
             90f,
             CameraProjection.Perspective
@@ -34,32 +29,46 @@ public class Player : PhysicalObject {
 
     }
 
-    private void events( Vector3 v ) {
-        /*
-        if( Raylib.IsMouseButtonDown( MouseButton.Left ) ) {
-            
+    private void RegisterMovementEvents( PlayerController pc,  float delta ) {
 
+        Vector3 forward = pc.GetForwardDelta();
 
-        }
-        */
+        Vector3 right   = Vector3.Normalize( Vector3.Cross( forward, Vector3.UnitY ) );
 
+        Vector3 vec = new();
+
+        float speed = 3;
+
+        if( Raylib.IsKeyDown( KeyboardKey.W ) )   vec +=  forward;
+        if( Raylib.IsKeyDown( KeyboardKey.S ) )   vec += -forward;
+        if( Raylib.IsKeyDown( KeyboardKey.A ) )   vec += -right  ;
+        if( Raylib.IsKeyDown( KeyboardKey.D ) )   vec +=  right  ;
+
+        vec *= speed;
+        
+        Position +=  delta * (vec + Momentum);
+        Console.WriteLine( Position );
+        Camera.Position = Position;
+        Camera.Target   = Position + forward;
     }
 
-    // -------------------------------------- Methods -------------------------------------- \\
-    public override void update( float delta ) {
+    public override void Tick( float delta ) {
+        
+        PlayerController pc = PlayerController.GetInstance();
 
-        Vector3 forward = PlayerController.update( this, ref camera, delta );
+        // pc.ExecuteEvents( delta );
 
-        // camera.Position.X = position.X + getMomentum().X; //+ getMovement().X;
-        // camera.Position.Z = position.Z + getMomentum().Z; //+ getMovement().Y; // not wrong
-        // camera.Position.Y = position.Y + getMomentum().Y;
+        RegisterMovementEvents( pc, delta );
 
-        WorldPhysics.AddGravity( this, delta );
+        // pc.ExecuteRegistredEvents( delta );
 
-        multiplyMovement( .9f, .9f, .9f );
+        Momentum *= .9f;
+    }
 
-        // Raylib.DrawCube( position + getMomentum(), 10, 10, 10, Color.White );
 
+    
+    public override void Render() {
+        
     }
 
 }
