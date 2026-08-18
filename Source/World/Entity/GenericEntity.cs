@@ -2,6 +2,7 @@ using System.Numerics;
 using Jitter2.Collision.Shapes;
 using Jitter2.Dynamics;
 using Raylib_cs;
+using Umbrage.Physics;
 
 namespace Umbrage.World.Entity;
 
@@ -9,6 +10,9 @@ public class GenericEntity {
     
     private Map Map;
     private RigidBody RigidBody;
+    
+    public MobileObject? mobileObject;
+
 
     public GenericEntity( Map map ) {
         
@@ -23,8 +27,6 @@ public class GenericEntity {
     public void ConfigRigidBody() {
 
         RigidBody.Position = Position;
-
-        Console.WriteLine( Size );
 
         RigidBody.AddShape( new BoxShape( Size.X, Size.Y, Size.Z ) );
 
