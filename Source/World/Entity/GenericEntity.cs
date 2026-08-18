@@ -28,8 +28,6 @@ public class GenericEntity {
 
         RigidBody.Position = Position;
 
-        Console.WriteLine( Size );
-
         RigidBody.AddShape( new BoxShape( Size.X, Size.Y, Size.Z ) );
 
         RigidBody.SetMassInertia( Mass );

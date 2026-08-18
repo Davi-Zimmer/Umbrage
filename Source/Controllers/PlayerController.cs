@@ -78,7 +78,7 @@ public class PlayerController {
 
     }
 
-    public Vector3 getMovementDirection( Vector3 forward, Vector3 right ) {
+    public Vector3 GetMovementDirection( Vector3 forward, Vector3 right ) {
         Vector3 input;
 
         input.Z = GetAxis( KeyboardKey.W, KeyboardKey.S );
@@ -115,7 +115,7 @@ public class PlayerController {
         return 1;
     }
 
-    public void processUpKeys() {
+    public void ProcessUpKeys() {
         
         if( Raylib.IsKeyUp( DashKey ) ) Player.CanDash = true;
         

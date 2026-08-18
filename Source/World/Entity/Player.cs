@@ -40,11 +40,13 @@ public class Player: GenericEntity {
 
         Vector3 forward = pc.GetForwardDelta();
         Vector3 right   = Vector3.Normalize( Vector3.Cross( forward, Vector3.UnitY ) );
-        Vector3 force = new();
+        Vector3 force   = new();
+
+        pc.ProcessUpKeys();
 
         pc.CheckForwardDash( forward );
         
-        force += pc.getMovementDirection( forward, right );
+        force += pc.GetMovementDirection( forward, right );
 
         force *= pc.DirectionalDashMultiplyer();
 
@@ -77,7 +79,6 @@ public class Player: GenericEntity {
         // pc.ExecuteRegistredEvents( delta );
 
     }
-
 
     
     public override void Render() {

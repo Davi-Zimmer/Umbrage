@@ -21,7 +21,7 @@ public class MobileObject {
     }
 
     public void UpdateEntityPosition( float delta ) {
-        Entity.Position = ( Momentum + Movement ) * delta;
+        Entity.Position += ( Momentum + Movement ) * delta;
     }
 
 
