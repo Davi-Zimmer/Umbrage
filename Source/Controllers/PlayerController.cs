@@ -33,23 +33,6 @@ public class PlayerController {
 
     private Dictionary< KeyboardKey, List<Callback> > KeyDown = new();
     private Dictionary< KeyboardKey, List<Callback> > KeyUp   = new();
-
-    public void KeyUpEvent( KeyboardKey key, Callback action ) {
-        
-        if( !KeyUp.ContainsKey( key ) ) KeyUp.Add( key, new() );
-
-        KeyUp[ key ].Add( action );
-
-    }
-
-    public void KeyDownEvent( KeyboardKey key, Callback action ) {
-        
-        if( !KeyDown.ContainsKey( key ) ) KeyDown.Add( key, new() );
-
-        KeyDown[ key ].Add( action );
-
-    }
-
     public Vector3 GetForwardDelta() {
 
         Vector2 mouseDelta = Raylib.GetMouseDelta();
@@ -71,38 +54,70 @@ public class PlayerController {
 
     }
 
-    public void ExecuteRegistredEvents( float delta ) {
+    public KeyboardKey DashKey = KeyboardKey.LeftControl;
 
-        foreach ( var pair in KeyDown ) {
-            
-            if( !Raylib.IsKeyDown( pair.Key ) ) continue;
-        
-            foreach ( var callback in pair.Value ) {
-                
-                callback( delta );
+    public bool IsAnyUpButDashKey() {
+        return (
+            Raylib.IsKeyDown( DashKey ) &&
+            Raylib.IsKeyUp( KeyboardKey.W ) &&
+            Raylib.IsKeyUp( KeyboardKey.S ) &&
+            Raylib.IsKeyUp( KeyboardKey.A ) &&
+            Raylib.IsKeyUp( KeyboardKey.D ) &&
+            Raylib.IsKeyUp( KeyboardKey.Space ) 
+        );
+    }
 
-            }    
-        
-        }
+    public float GetAxis( KeyboardKey positive, KeyboardKey negative ) {
 
-        foreach ( var pair in KeyUp ) {
-            
-            if( !Raylib.IsKeyUp( pair.Key ) ) continue;
+        float value = 0;
 
-            foreach ( var callback in pair.Value ) {
-                
-                callback( delta );
+        if( Raylib.IsKeyDown( positive ) ) value += 1;
+        if( Raylib.IsKeyDown( negative ) ) value -= 1;
 
-            }
-
-        }
+        return value;
 
     }
 
-    public void ExecuteEvents( float delta ) {
+    public Vector3 getMovementDirection( Vector3 forward, Vector3 right ) {
+        Vector3 input;
+
+        input.Z = GetAxis( KeyboardKey.W, KeyboardKey.S );
+        input.X = GetAxis( KeyboardKey.D, KeyboardKey.A );
+        input.Y = Raylib.IsKeyDown( KeyboardKey.Space ) ? 1 : 0;
+
+        Vector3 movement = right * input.X + forward * input.Z + Vector3.UnitY * input.Y;
+
+        return movement;
+    }
+
+    public void CheckForwardDash( Vector3 direction ) {
+
+        if( !Player.CanDash ) return;
+
+        if( !IsAnyUpButDashKey() ) return;
+
+        Player.mobileObject.move( direction * Player.DashSpeed );
+
+        Player.CanDash = false;
+
+    }
+
+    public float DirectionalDashMultiplyer() {
         
+        if( Player.CanDash && Raylib.IsKeyDown( DashKey ) ) {
+
+            Player.CanDash = false;
+            
+            return Player.DashSpeed;
+
+        }
         
+        return 1;
+    }
+
+    public void processUpKeys() {
         
+        if( Raylib.IsKeyUp( DashKey ) ) Player.CanDash = true;
         
     }
 
