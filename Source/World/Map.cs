@@ -5,6 +5,7 @@ using Umbrage.World;
 using Umbrage.World.Entity;
 using Jitter2;
 using Jitter2.Dynamics;
+using System.Diagnostics;
 
 public class Map {
 
@@ -12,11 +13,15 @@ public class Map {
     
     public float gameSpeed = 3;
 
+    public Game Game;
+
     Player Player;
 
     public List<GenericEntity> scene = new();
 
-    public Map() {
+    public Map( Game game ) {
+        Game = game; 
+
         World.Gravity = new Vector3( 0, -9, 0 );
         
         Player  = new Player( this ).Configure<Player>( p => {
@@ -46,8 +51,7 @@ public class Map {
             r.MotionType         = MotionType.Static;
         }) );
 
-
-         AddToScene( new GenericEntity( this ).Configure<GenericEntity>( e => {
+        AddToScene( new GenericEntity( this ).Configure<GenericEntity>( e => {
             RigidBody r          = e.RigidBody; 
             e.Color              = Color.Red;
             e.RigidBody.Position = new Vector3( 0, 15, 20 );
@@ -62,7 +66,9 @@ public class Map {
 
     private void AddToScene( GenericEntity entity ) {
         
-        scene.Add( entity );
+        actions.Add(() => {
+            scene.Add( entity );
+        });
 
     }
 
@@ -76,10 +82,55 @@ public class Map {
 
     }
 
+    public List<Action> actions = new();
 
+    public void removeScene( RigidBody body ) {
+        
+        actions.Add(() => {
+
+            GenericEntity? toDelete = null;
+
+            foreach( GenericEntity e in scene ) {
+            
+                if( e.RigidBody.GetHashCode() == body.GetHashCode() ) {
+                    toDelete = e;
+                    break;
+                }
+
+            }
+
+            if( toDelete != null ) {
+
+                scene.Remove( toDelete );
+                World.Remove( body );
+                
+            }
+
+        });
+
+    }
+
+    public void ExecutePreLoopFuncs() {
+
+        foreach( var action in actions ) action();
+
+        actions = [];
+
+    }
+
+    public List<Action> pos3DRender = new();
+
+    public void ExecutePos3D() {
+        
+        foreach( Action action in pos3DRender ) action();
+
+    }
+    
     public void Update( float delta ) {
 
         // StepSimulation( delta );
+        ExecutePreLoopFuncs();
+
 
         World.Step( delta * gameSpeed, true );
 
@@ -92,6 +143,9 @@ public class Map {
         }
 
         Raylib.EndMode3D();
+
+        ExecutePos3D();
+        
 
     }
 

@@ -1,5 +1,7 @@
 using System.Numerics;
+using Jitter2.Collision.Shapes;
 using Jitter2.Dynamics;
+using Jitter2.LinearMath;
 using Raylib_cs;
 using Umbrage.Controllers;
 
@@ -19,6 +21,7 @@ public class Player: GenericEntity {
     public int DashCooldown = 10;
     public int DashCooldownCount = 0;
 
+    public Vector3 Forward = new( 0 );
     public Vector3 CameraAnchor = new();
     public float DashSpeed = 20f;
     public Camera3D Camera;
@@ -36,11 +39,13 @@ public class Player: GenericEntity {
 
         JumpMultiplyer *= -RigidBody.World.Gravity.Y;
 
+        RegisterCrossHair();
+
     }
 
     private void UpdatePlayerMovement( PlayerController pc,  float delta ) {
 
-        Vector3 forward     = pc.GetForwardDelta();
+        Vector3 forward     = Forward;
         Vector3 right       = Vector3.Normalize( Vector3.Cross( forward, Vector3.UnitY ) );
         Vector3 forwardFlat = Vector3.Normalize( new Vector3(forward.X, 0, forward.Z) );
 
@@ -60,10 +65,11 @@ public class Player: GenericEntity {
 
     }
     
-    
     public override void Tick( float delta ) {
 
         PlayerController pc = PlayerController.GetInstance();
+        
+        Forward = pc.GetForwardDelta();
         
         RigidBody.Velocity *= new Vector3( .9f, 1f, .9f );
 
@@ -71,18 +77,40 @@ public class Player: GenericEntity {
 
         UpdatePlayerMovement( pc, delta );
 
-        Console.WriteLine( DashCooldownCount );
-
         DashCooldownCount = Math.Max( DashCooldownCount - 1, 0 );
+
+        if( Raylib.IsMouseButtonDown( MouseButton.Left ) ) Shot();
 
     }
 
-    
     public override void Render() {
         
     }
 
     // ------------------------------------ Features Functions ------------------------------------ \\ 
+    
+    public void Shot(){
+
+        Vector3 from = RigidBody.Position + CameraAnchor;
+        Vector3 to = Forward;
+        
+        bool hit = RigidBody.World.DynamicTree.RayCast( from, to, null, null, out var hitProxy, out var normal, out float lambda );
+
+        if( hit ) {
+            
+            if( hitProxy is RigidBodyShape shape ) {
+                
+                RigidBody target = shape.RigidBody;
+                
+                Map.removeScene( target );
+
+            }
+
+        }
+
+    }
+
+    
     public void CheckJumpReset() {
         
         Grounded = IsGrounded();
@@ -131,4 +159,22 @@ public class Player: GenericEntity {
         Camera.Target   = RigidBody.Position + CameraAnchor + forward;
 
     }
+
+    private void RegisterCrossHair() {
+        
+        Map.pos3DRender.Add(() => {
+            int size = 10;
+            int width  = Map.Game.innerWidth;
+            int height = Map.Game.innerHeight;
+
+            int middleX = width / 2;
+            int middleY = height / 2;
+
+            int posY = middleY + size;
+            Raylib.DrawLine( middleX, middleY, middleX - size, posY, Color.Red );
+            Raylib.DrawLine( middleX, middleY, middleX + size, posY, Color.Red );
+        });
+
+    }
+
 }
