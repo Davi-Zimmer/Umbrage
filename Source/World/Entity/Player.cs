@@ -1,7 +1,7 @@
 using System.Numerics;
+using Jitter2.Dynamics;
 using Raylib_cs;
 using Umbrage.Controllers;
-using Umbrage.Physics;
 
 namespace Umbrage.World.Entity;
 
@@ -9,74 +9,71 @@ public class Player: GenericEntity {
     
     public float Yaw   = 0;
     public float Pitch = 0;
-    public float Speed = .2f;
+    public float Speed = 90f;
+    public float JumpMultiplyer = 2f;
+    public bool CanJump = true;
+    public bool Grounded = false;
     public bool CanDash = true;
+    public int DashCount = 0;
+    public int MaxDash = 3;
+    public int DashCooldown = 10;
+    public int DashCooldownCount = 0;
 
-    public float DashSpeed = 50;
-
-    public new MobileObject mobileObject;
-
+    public Vector3 CameraAnchor = new();
+    public float DashSpeed = 20f;
     public Camera3D Camera;
     public Player( Map map  ): base( map ) {
         
-        PlayerController pc = PlayerController.CreateInstance( this );
-
+        PlayerController.CreateInstance( this );
+        
         Camera = new Camera3D(
-            Position,
-            Position + Vector3.UnitZ,
+            RigidBody.Position,
+            RigidBody.Position + Vector3.UnitZ,
             Vector3.UnitY,
             90f,
             CameraProjection.Perspective
         );
 
-        mobileObject = new( this );
+        JumpMultiplyer *= -RigidBody.World.Gravity.Y;
 
     }
 
     private void UpdatePlayerMovement( PlayerController pc,  float delta ) {
 
-        // Vector3 forwardFlat = new Vector3(forward.X, 0, forward.Z);
-        // forwardFlat = Vector3.Normalize( forwardFlat );
+        Vector3 forward     = pc.GetForwardDelta();
+        Vector3 right       = Vector3.Normalize( Vector3.Cross( forward, Vector3.UnitY ) );
+        Vector3 forwardFlat = Vector3.Normalize( new Vector3(forward.X, 0, forward.Z) );
 
-        Vector3 forward = pc.GetForwardDelta();
-        Vector3 right   = Vector3.Normalize( Vector3.Cross( forward, Vector3.UnitY ) );
         Vector3 force   = new();
 
         pc.ProcessUpKeys();
 
-        pc.CheckForwardDash( forward );
-        
-        force += pc.GetMovementDirection( forward, right );
+        force += pc.CheckForwardDash( forwardFlat );
 
-        force *= pc.DirectionalDashMultiplyer();
+        force += pc.GetJumpForce();
 
-        mobileObject.move( force );
+        force += pc.GetMovementDirection( forwardFlat, right );
 
-        mobileObject.UpdateEntityPosition( delta );        
+        RigidBody.ApplyImpulse( force );
 
         UpdateCamera( forward );
-  
-    }
-
-    private void UpdateCamera( Vector3 forward ) {
-        
-        Camera.Position = Position;
-        Camera.Target   = Position + forward;
 
     }
-
+    
+    
     public override void Tick( float delta ) {
-        
-        PlayerController pc = PlayerController.GetInstance();
 
-        // pc.ExecuteEvents( delta );
+        PlayerController pc = PlayerController.GetInstance();
+        
+        RigidBody.Velocity *= new Vector3( .9f, 1f, .9f );
+
+        CheckJumpReset();
 
         UpdatePlayerMovement( pc, delta );
-        
-        mobileObject.Momentum *= .9f;
-        mobileObject.Movement *= .9f;
 
-        // pc.ExecuteRegistredEvents( delta );
+        Console.WriteLine( DashCooldownCount );
+
+        DashCooldownCount = Math.Max( DashCooldownCount - 1, 0 );
 
     }
 
@@ -85,4 +82,53 @@ public class Player: GenericEntity {
         
     }
 
+    // ------------------------------------ Features Functions ------------------------------------ \\ 
+    public void CheckJumpReset() {
+        
+        Grounded = IsGrounded();
+
+        if( Grounded ) DashCount = 0;
+
+    }
+
+    public void AddDashCooldown() { 
+        DashCooldownCount = DashCooldown;
+    }
+
+    public void Dash() {
+
+        DashCount++;
+
+        Console.WriteLine( $"Dash { DashCount }" );
+
+        CanDash = false;
+
+        AddDashCooldown();
+    }
+
+    bool IsGrounded(){
+
+        foreach (var arbiter in RigidBody.Contacts) {
+
+            ref var data = ref arbiter.Handle.Data;
+
+            if( data.Contact0.Normal.Y < -0.5f ) return true;
+            /*
+            if( ( data.UsageMask & 1 ) != 0 && data.Contact0.Normal.Y < -0.5f ) return true;
+            if( ( data.UsageMask & 2 ) != 0 && data.Contact1.Normal.Y < -0.5f ) return true;
+            if( ( data.UsageMask & 4 ) != 0 && data.Contact2.Normal.Y < -0.5f ) return true;
+            if( ( data.UsageMask & 8 ) != 0 && data.Contact3.Normal.Y < -0.5f ) return true;
+            */
+
+        }
+
+        return false;
+    }
+
+    private void UpdateCamera( Vector3 forward ) {
+        
+        Camera.Position = RigidBody.Position + CameraAnchor;
+        Camera.Target   = RigidBody.Position + CameraAnchor + forward;
+
+    }
 }

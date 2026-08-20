@@ -2,17 +2,13 @@ using System.Numerics;
 using Jitter2.Collision.Shapes;
 using Jitter2.Dynamics;
 using Raylib_cs;
-using Umbrage.Physics;
 
 namespace Umbrage.World.Entity;
 
 public class GenericEntity {
     
     private Map Map;
-    private RigidBody RigidBody;
-    
-    public MobileObject? mobileObject;
-
+    public RigidBody RigidBody;
 
     public GenericEntity( Map map ) {
         
@@ -26,13 +22,12 @@ public class GenericEntity {
 
     public void ConfigRigidBody() {
 
-        RigidBody.Position = Position;
-
         RigidBody.AddShape( new BoxShape( Size.X, Size.Y, Size.Z ) );
 
-        RigidBody.SetMassInertia( Mass );
-
     }
+
+    private void updateRigidBoryMass() { RigidBody.SetMassInertia( Mass ); }
+
 
     public T Configure<T>( Action<T> callback ) where T: GenericEntity {
         
@@ -40,13 +35,14 @@ public class GenericEntity {
 
         ConfigRigidBody();
 
+        updateRigidBoryMass();
+
         return (T)this;
 
     }
 
     public float Mass = 1;
 
-    public Vector3 Position = new( 0, 0, 0 );
     public Vector3 Size = new( 1, 1, 1 );
 
     public Color Color = Color.Gray;
@@ -66,7 +62,7 @@ public class GenericEntity {
     public virtual void Render() {
         
         Raylib.DrawCube(
-            Position,
+            RigidBody.Position,
             Size.X,
             Size.Y,
             Size.Z,

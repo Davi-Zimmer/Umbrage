@@ -1,5 +1,4 @@
 using Raylib_cs;
-using Umbrage.Jitter;
 
 namespace Umbrage;
 
