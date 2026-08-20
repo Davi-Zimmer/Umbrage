@@ -1,4 +1,4 @@
-using Umbrage.World.Object;
+using Umbrage.World;
 
 namespace Umbrage.World;
 

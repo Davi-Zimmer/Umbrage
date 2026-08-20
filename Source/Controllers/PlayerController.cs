@@ -33,6 +33,7 @@ public class PlayerController {
 
     private Dictionary< KeyboardKey, List<Callback> > KeyDown = new();
     private Dictionary< KeyboardKey, List<Callback> > KeyUp   = new();
+    
     public Vector3 GetForwardDelta() {
 
         Vector2 mouseDelta = Raylib.GetMouseDelta();
@@ -71,42 +72,70 @@ public class PlayerController {
 
         float value = 0;
 
-        if( Raylib.IsKeyDown( positive ) ) value += 1;
-        if( Raylib.IsKeyDown( negative ) ) value -= 1;
+        if( Raylib.IsKeyDown( positive ) ) value += Player.Speed;
+        if( Raylib.IsKeyDown( negative ) ) value -= Player.Speed;
 
         return value;
 
     }
 
+    private float JumpFactor() {
+
+        if(  Raylib.IsKeyDown( KeyboardKey.Space ) && Player.CanJump && Player.Grounded ) {
+
+            Player.CanJump = false;
+
+            return Player.JumpMultiplyer;
+        }
+
+        return 0;
+    }
+
     public Vector3 GetMovementDirection( Vector3 forward, Vector3 right ) {
+        
         Vector3 input;
 
         input.Z = GetAxis( KeyboardKey.W, KeyboardKey.S );
-        input.X = GetAxis( KeyboardKey.D, KeyboardKey.A );
-        input.Y = Raylib.IsKeyDown( KeyboardKey.Space ) ? 1 : 0;
+        input.X = GetAxis( KeyboardKey.D, KeyboardKey.A ); 
+        // input.Y = JumpFactor();
 
-        Vector3 movement = right * input.X + forward * input.Z + Vector3.UnitY * input.Y;
+        Vector3 movement = right * input.X + forward * input.Z;
 
-        return movement;
+        return movement * DirectionalDashMultiplyer();
     }
 
-    public void CheckForwardDash( Vector3 direction ) {
+    public Vector3 GetJumpForce() {
 
-        if( !Player.CanDash ) return;
+        return new Vector3( 0, JumpFactor() * Player.Speed, 0 );
 
-        if( !IsAnyUpButDashKey() ) return;
+    }
 
-        Player.mobileObject.move( direction * Player.DashSpeed );
+    public bool DashLimit() {
 
-        Player.CanDash = false;
+        if( Player.DashCooldownCount > 0 ) return true;
+
+        return Player.DashCount >= Player.MaxDash;
+    }
+
+    public Vector3 CheckForwardDash( Vector3 direction ) {
+
+        if( !Player.CanDash ) return new Vector3( 0 );
+
+        if( !IsAnyUpButDashKey() ) return new Vector3( 0 );
+
+        if( DashLimit() ) return new Vector3( 0 );
+
+        Player.Dash();
+
+        return direction * Player.DashSpeed * Player.Speed;
 
     }
 
     public float DirectionalDashMultiplyer() {
         
-        if( Player.CanDash && Raylib.IsKeyDown( DashKey ) ) {
+        if( Player.CanDash && Raylib.IsKeyDown( DashKey ) && !DashLimit() ) {
 
-            Player.CanDash = false;
+            Player.Dash();
             
             return Player.DashSpeed;
 
@@ -117,8 +146,10 @@ public class PlayerController {
 
     public void ProcessUpKeys() {
         
-        if( Raylib.IsKeyUp( DashKey ) ) Player.CanDash = true;
+        if( Raylib.IsKeyUp( DashKey )           ) Player.CanDash = true;
+        if( Raylib.IsKeyUp( KeyboardKey.Space ) ) Player.CanJump = true;
         
     }
+
 
 }
