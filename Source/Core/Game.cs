@@ -4,12 +4,13 @@ namespace Umbrage;
 
 public class Game {
     
-    private int innerWidth  = 0;
-    private int innerHeight = 0;
+    public int innerWidth  = 0;
+    public int innerHeight = 0;
 
-    private Map Map = new();
+    private Map Map;
 
     public Game() {
+        Map = new( this );
         
     }
     

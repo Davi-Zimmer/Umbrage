@@ -7,7 +7,7 @@ namespace Umbrage.World.Entity;
 
 public class GenericEntity {
     
-    private Map Map;
+    public Map Map;
     public RigidBody RigidBody;
 
     public GenericEntity( Map map ) {
