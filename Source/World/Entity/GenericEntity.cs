@@ -2,12 +2,14 @@ using System.Numerics;
 using Jitter2.Collision.Shapes;
 using Jitter2.Dynamics;
 using Raylib_cs;
+using Umbrage.Components;
 
 namespace Umbrage.World.Entity;
 
 public class GenericEntity {
     
     public Map Map;
+    public Health? Health;
     public RigidBody RigidBody;
 
     public GenericEntity( Map map ) {
