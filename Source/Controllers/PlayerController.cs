@@ -97,7 +97,6 @@ public class PlayerController {
 
         input.Z = GetAxis( KeyboardKey.W, KeyboardKey.S );
         input.X = GetAxis( KeyboardKey.D, KeyboardKey.A ); 
-        // input.Y = JumpFactor();
 
         Vector3 movement = right * input.X + forward * input.Z;
 
@@ -148,6 +147,12 @@ public class PlayerController {
         
         if( Raylib.IsKeyUp( DashKey )           ) Player.CanDash = true;
         if( Raylib.IsKeyUp( KeyboardKey.Space ) ) Player.CanJump = true;
+        
+    }
+
+    public void MouseInput() {
+        
+        if( Raylib.IsMouseButtonPressed( MouseButton.Left ) ) Player.Shot();
         
     }
 

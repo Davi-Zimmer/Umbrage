@@ -6,8 +6,11 @@ using Umbrage.World.Entity;
 using Jitter2;
 using Jitter2.Dynamics;
 using System.Diagnostics;
+using Umbrage.Components;
 
 public class Map {
+    public List<Action> actions = new();
+    public List<Action> pos3DRender = new();
 
     public World World = new();
     
@@ -82,8 +85,7 @@ public class Map {
 
     }
 
-    public List<Action> actions = new();
-
+   
     public void removeScene( RigidBody body ) {
         
         actions.Add(() => {
@@ -118,7 +120,34 @@ public class Map {
 
     }
 
-    public List<Action> pos3DRender = new();
+
+    public delegate void FindByRigidBodyCallback( GenericEntity entity );
+    public GenericEntity? FindByRigidBody( RigidBody body, FindByRigidBodyCallback? cb = null ) {
+
+        foreach ( GenericEntity e in scene ) {
+            
+            if( e.RigidBody == body ) {
+                
+                if( cb == null ) return e;
+
+                cb( e );
+
+            }
+            
+
+        }
+
+        return null;
+
+    }
+
+
+    public CastEntity RayCast( Vector3 from, Vector3 to ) {
+    
+        return new( from, to, World );
+
+    }
+
 
     public void ExecutePos3D() {
         

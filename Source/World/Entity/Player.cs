@@ -3,6 +3,7 @@ using Jitter2.Collision.Shapes;
 using Jitter2.Dynamics;
 using Jitter2.LinearMath;
 using Raylib_cs;
+using Umbrage.Components;
 using Umbrage.Controllers;
 
 namespace Umbrage.World.Entity;
@@ -25,17 +26,14 @@ public class Player: GenericEntity {
     public Vector3 CameraAnchor = new();
     public float DashSpeed = 20f;
     public Camera3D Camera;
+    public new Health Health = new( 100 ); 
+
+
     public Player( Map map  ): base( map ) {
         
         PlayerController.CreateInstance( this );
         
-        Camera = new Camera3D(
-            RigidBody.Position,
-            RigidBody.Position + Vector3.UnitZ,
-            Vector3.UnitY,
-            90f,
-            CameraProjection.Perspective
-        );
+        Camera = CreateCamera();
 
         JumpMultiplyer *= -RigidBody.World.Gravity.Y;
 
@@ -79,7 +77,8 @@ public class Player: GenericEntity {
 
         DashCooldownCount = Math.Max( DashCooldownCount - 1, 0 );
 
-        if( Raylib.IsMouseButtonDown( MouseButton.Left ) ) Shot();
+        pc.MouseInput();
+
 
     }
 
@@ -94,19 +93,19 @@ public class Player: GenericEntity {
         Vector3 from = RigidBody.Position + CameraAnchor;
         Vector3 to = Forward;
         
-        bool hit = RigidBody.World.DynamicTree.RayCast( from, to, null, null, out var hitProxy, out var normal, out float lambda );
+        Map.RayCast( from, to ).then( shape => {
 
-        if( hit ) {
-            
-            if( hitProxy is RigidBodyShape shape ) {
+            RigidBody target = shape.RigidBody;
+
+            Map.FindByRigidBody( target, entity => {
                 
-                RigidBody target = shape.RigidBody;
-                
-                Map.removeScene( target );
+                entity.Health?.TakeDamage( 1 );
 
-            }
+                Console.WriteLine( entity.Health?.Current );
 
-        }
+            });
+
+        });
 
     }
 
@@ -177,4 +176,13 @@ public class Player: GenericEntity {
 
     }
 
+    private Camera3D CreateCamera() {
+        return new Camera3D(
+            RigidBody.Position,
+            RigidBody.Position + Vector3.UnitZ,
+            Vector3.UnitY,
+            90f,
+            CameraProjection.Perspective
+        );
+    }
 }
