@@ -93,15 +93,19 @@ public class Player: GenericEntity {
         Vector3 from = RigidBody.Position + CameraAnchor;
         Vector3 to = Forward;
         
+        Console.WriteLine("Shot");
+
         Map.RayCast( from, to ).then( shape => {
+            
+            Console.WriteLine("RayCast hit");
 
             RigidBody target = shape.RigidBody;
 
-            Map.FindByRigidBody( target, entity => {
-                
-                entity.Health?.TakeDamage( 1 );
+            Map.FindEnemyByRigidBody( target, enemy => {
 
-                Console.WriteLine( entity.Health?.Current );
+                enemy.Health.TakeDamage( 5 );
+
+                Console.WriteLine( enemy.Health.Current );
 
             });
 
