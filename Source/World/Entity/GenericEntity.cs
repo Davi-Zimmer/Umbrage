@@ -9,7 +9,7 @@ namespace Umbrage.World.Entity;
 public class GenericEntity {
     
     public Map Map;
-    public Health? Health;
+    public Health? Health { get; protected set; }
     public RigidBody RigidBody;
 
     public GenericEntity( Map map ) {

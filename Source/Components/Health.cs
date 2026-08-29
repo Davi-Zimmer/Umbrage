@@ -3,7 +3,8 @@ namespace Umbrage.Components;
 public class Health {
 
     public List< Action > DeathEvents { get; private set; } = new();
-    public List< Action > HurtEvents { get; private set; } = new();
+    public List< Action > DamageEvents { get; private set; } = new();
+    public bool Damagable = true;
     public int Current { get; private set; } = 10;
     public int Max = 10;
 
@@ -38,7 +39,7 @@ public class Health {
 
     public void ExecuteHurtEvents() {
         
-        foreach( Action action in HurtEvents ) action();
+        foreach( Action action in DamageEvents ) action();
         
     }
 

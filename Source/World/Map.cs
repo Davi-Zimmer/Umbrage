@@ -18,7 +18,7 @@ public class Map {
 
     public Game Game;
 
-    Player Player;
+    public Player Player;
 
     public List<GenericEntity> scene = new();
 
@@ -62,6 +62,13 @@ public class Map {
             r.AffectedByGravity  = false;
             r.MotionType         = MotionType.Static;
         }) );
+
+        AddToScene( new Enemy( this ).Configure<Enemy>( e => {
+            e.RigidBody.Position = new Vector3( 0, 10, 10 );
+            e.Size               = new Vector3( 2, 4, 2 );
+            e.Mass               = 10;
+            e.Color              = Color.SkyBlue;
+        }));
 
         AddToScene( Player );
 
@@ -120,9 +127,9 @@ public class Map {
 
     }
 
+    public delegate void FindGEByRigidBodyCallback( GenericEntity entity );
 
-    public delegate void FindByRigidBodyCallback( GenericEntity entity );
-    public GenericEntity? FindByRigidBody( RigidBody body, FindByRigidBodyCallback? cb = null ) {
+    public GenericEntity? FindGenericEntityByRigidBody( RigidBody body, FindGEByRigidBodyCallback? cb = null ) {
 
         foreach ( GenericEntity e in scene ) {
             
@@ -133,11 +140,26 @@ public class Map {
                 cb( e );
 
             }
-            
 
         }
 
         return null;
+
+    }
+
+    public delegate void FindEByRigidBodyCallback( Enemy entity );
+
+    public void FindEnemyByRigidBody( RigidBody body, FindEByRigidBodyCallback cb ) {
+
+        foreach ( GenericEntity e in scene ) {
+            
+            if( e.RigidBody == body ) {
+
+                if( e is Enemy ) cb( ( e as Enemy )! );
+
+            }
+
+        }
 
     }
 
