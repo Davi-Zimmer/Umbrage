@@ -45,8 +45,6 @@ public class Enemy: GenericEntity {
         
         base.Render();
 
-
-
     }
 
 

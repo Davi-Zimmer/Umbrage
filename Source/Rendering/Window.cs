@@ -23,6 +23,9 @@ public class Window {
         Raylib.InitWindow( 800, 450, "Umbrage" );
         Raylib.SetTargetFPS( 60 );
 
+
+        string path = Directory.GetCurrentDirectory() + "/Assets/placeholder.png";
+        
     }
 
     private void startLoop( Loop loop, Func end ) {

@@ -166,16 +166,9 @@ public class Player: GenericEntity {
     private void RegisterCrossHair() {
         
         Map.pos3DRender.Add(() => {
-            int size = 10;
-            int width  = Map.Game.innerWidth;
-            int height = Map.Game.innerHeight;
-
-            int middleX = width / 2;
-            int middleY = height / 2;
-
-            int posY = middleY + size;
-            Raylib.DrawLine( middleX, middleY, middleX - size, posY, Color.Red );
-            Raylib.DrawLine( middleX, middleY, middleX + size, posY, Color.Red );
+            
+            Map.Game.Interface.RenderCrosshair();
+            
         });
 
     }
