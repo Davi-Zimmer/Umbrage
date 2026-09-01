@@ -1,4 +1,6 @@
 using Raylib_cs;
+using Umbrage.Graphycs;
+using Umbrage.Rendering;
 
 namespace Umbrage;
 
@@ -9,8 +11,11 @@ public class Game {
 
     private Map Map;
 
+    public Interface Interface;
+
     public Game() {
         Map = new( this );
+        Interface = new( this );
         
     }
     
@@ -20,7 +25,8 @@ public class Game {
         Raylib.DisableCursor();
         ResizeWindow();
 
-        //string path = Directory.GetCurrentDirectory() + "/Assets/placeholder.png";
+        Textures.Load();
+
         // spritesheet = Raylib.LoadTexture( path );
         // Raylib.SetTextureFilter( spritesheet, TextureFilter.Point );
         // configCamera();
@@ -37,7 +43,7 @@ public class Game {
     public void Finish() {
 
         /// Raylib.UnloadTexture( spritesheet );
-
+        Textures.Unload();
     }
 
     public void Update( float delta ) {
