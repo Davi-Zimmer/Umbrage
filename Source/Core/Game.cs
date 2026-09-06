@@ -20,12 +20,17 @@ public class Game {
     }
     
 
-    public void Setup() {
+    public async void Setup() {
 
         Raylib.DisableCursor();
         ResizeWindow();
 
+        Shaders.Load();
         Textures.Load();
+
+        Map.Init();
+
+        Map.Setup();
 
         // spritesheet = Raylib.LoadTexture( path );
         // Raylib.SetTextureFilter( spritesheet, TextureFilter.Point );
@@ -48,8 +53,6 @@ public class Game {
 
     public void Update( float delta ) {
         
-        Raylib.ClearBackground( new Color( 20, 20, 50 ) );
-
         Map.Update( delta );
 
     }
