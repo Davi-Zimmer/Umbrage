@@ -6,7 +6,9 @@ namespace Umbrage.Graphycs;
 public class Textures {
     
     public enum Names {
-        Crosshair
+        Crosshair,
+        SkyBox,
+        Grass
     }
     
     private Textures() {}
@@ -24,6 +26,11 @@ public class Textures {
         string base_ = Directory.GetCurrentDirectory() + "/Assets";
 
         AddToLoaded2D( Names.Crosshair, base_ + "/crosshair.png" );
+
+        AddToLoaded2D( Names.SkyBox, base_ + "/skybox.png" );
+
+        AddToLoaded2D( Names.Grass, base_ + "/grass.png" );
+
 
     }
 

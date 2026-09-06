@@ -20,6 +20,7 @@ public class GenericEntity {
 
         ConfigRigidBody();
 
+        UpdateConfig();
     }
 
     public void ConfigRigidBody() {
@@ -39,8 +40,14 @@ public class GenericEntity {
 
         updateRigidBoryMass();
 
+        UpdateConfig();
+
         return (T)this;
 
+    }
+
+    public virtual void UpdateConfig() {
+        
     }
 
     public float Mass = 1;
@@ -54,7 +61,6 @@ public class GenericEntity {
         Tick( delta );
 
         Render();
-
     }
 
     public virtual void Tick( float delta ) {

@@ -15,7 +15,7 @@ public class Interface {
         
         Texture2D crosshair = Textures.GetTexture2D( Textures.Names.Crosshair );
 
-        float size = .1f;
+        float size = .05f;
 
         int x = Game.innerWidth  / 2 - (int)((crosshair.Width / 2) * size);
         int y = Game.innerHeight / 2 ;

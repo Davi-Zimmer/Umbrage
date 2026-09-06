@@ -7,18 +7,23 @@ using Jitter2;
 using Jitter2.Dynamics;
 using System.Diagnostics;
 using Umbrage.Components;
+using Umbrage.Graphycs;
 
 public class Map {
     public List<Action> actions = new();
     public List<Action> pos3DRender = new();
 
     public World World = new();
+
+    public Model sky;
+
+    public Color skyColor = new Color( 11, 44, 132 );
     
     public float gameSpeed = 3;
 
     public Game Game;
 
-    public Player Player;
+    public Player Player = null!;
 
     public List<GenericEntity> scene = new();
 
@@ -26,8 +31,12 @@ public class Map {
         Game = game; 
 
         World.Gravity = new Vector3( 0, -9, 0 );
-        
-        Player  = new Player( this ).Configure<Player>( p => {
+    
+    }
+
+    public void Init() {
+
+        Player = new Player( this ).Configure<Player>( p => {
             //p.RigidBody.AffectedByGravity = false;
             p.RigidBody.Position = new Vector3( 0, 5, 0 );
             p.Size               = new Vector3( 1, 2, 1 );
@@ -47,11 +56,13 @@ public class Map {
 
         AddToScene( new GenericEntity( this ).Configure<GenericEntity>( e => {
             RigidBody r          = e.RigidBody; 
-            e.Color              = Color.Gray;
+            
+            e.Color              = new Color  ( 93, 155, 7 );
             e.RigidBody.Position = new Vector3( 0, 2, 0 );
-            e.Size               = new Vector3( 50, 10, 50 );
+            e.Size               = new Vector3( 500, 10, 500 );
             r.AffectedByGravity  = false;
             r.MotionType         = MotionType.Static;
+
         }) );
 
         AddToScene( new GenericEntity( this ).Configure<GenericEntity>( e => {
@@ -62,16 +73,41 @@ public class Map {
             r.AffectedByGravity  = false;
             r.MotionType         = MotionType.Static;
         }) );
-
+    /*
         AddToScene( new Enemy( this ).Configure<Enemy>( e => {
             e.RigidBody.Position = new Vector3( 0, 10, 10 );
             e.Size               = new Vector3( 2, 4, 2 );
             e.Mass               = 10;
-            e.Color              = Color.SkyBlue;
+            e.Color              = Color.Yellow;
+        }));
+    */
+
+        AddToScene( new TestEntity( this ).Configure<TestEntity>( t => {
+            t.RigidBody.Position = new( 50, 20, 10 );
+            t.Size               = new( 1, 20, 20 );
         }));
 
         AddToScene( Player );
+    }
 
+    public void Setup() {
+
+       sky = Raylib.LoadModelFromMesh( Raylib.GenMeshSphere( 1000.0f, 64, 64 ) );
+       
+        string base_ = Directory.GetCurrentDirectory() + "/Assets";
+        
+        unsafe {
+            sky.Materials[0].Shader = Shaders.GetShader( Shaders.Names.Sky );
+
+            sky.Materials[0].Maps[
+                (int)MaterialMapIndex.Albedo
+            ].Texture = Textures.GetTexture2D(
+                Textures.Names.SkyBox
+            );
+        }
+
+
+        
     }
 
     private void AddToScene( GenericEntity entity ) {
@@ -179,14 +215,28 @@ public class Map {
     
     public void Update( float delta ) {
 
+        Raylib.ClearBackground( skyColor );
+        
+   
+
         // StepSimulation( delta );
         ExecutePreLoopFuncs();
-
 
         World.Step( delta * gameSpeed, true );
 
         Raylib.BeginMode3D( Player.Camera );
 
+        Rlgl.DisableBackfaceCulling();
+    
+        Raylib.DrawModel(
+            sky,
+            Player.Camera.Position,
+            1f,
+            Color.White
+        );
+
+        Rlgl.EnableBackfaceCulling();
+    
         foreach( GenericEntity entity in scene ) {
             
             entity.Update( delta );
