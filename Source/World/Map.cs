@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Runtime.InteropServices;
 using Jitter2;
 using Jitter2.Collision.Shapes;
 using Jitter2.Dynamics;
@@ -7,32 +8,23 @@ using Raylib_cs;
 
 public class Map {
 
-    Camera3D camera = new() {
-        Position   = new Vector3( -20.0f, 8.0f, 10.0f ),
-        Target     = new Vector3(   0.0f, 4.0f, 0.0f  ),
-        Up         = new Vector3(   0.0f, 1.0f, 0.0f  ),
-        FovY       = 45.0f,
-        Projection = CameraProjection.Perspective
-    };
-
     public World World = new();
     private List<Object> Scene = new();
-
     private List<Action> Actions = new();
     RigidBody plane;
     Model planeModel;
 
-    public Texture2D GenCheckedTexture(int size, int checks, Color colorA, Color colorB)
-    {
-        Image imageMag = Raylib.GenImageChecked(size, size, checks, checks, colorA, colorB);
-        Texture2D textureMag = Raylib.LoadTextureFromImage(imageMag);
-        Raylib.UnloadImage(imageMag);
-        return textureMag;
-    }
+    Player Player;
+    Model Model;
+    Vector3 ModelPosition;
+
+    Room Room;
 
     public Map(){
 
         World.SubstepCount = 4;
+
+        World.Gravity = new( 0, -9, 0 );
 
         for( int i = 0; i < 10; i++ ) {
             
@@ -44,45 +36,45 @@ public class Map {
         }
 
         Texture2D texture = Texture.Get( Texture.Name.Ground );
-        planeModel = Raylib.LoadModelFromMesh(Raylib.GenMeshPlane( 10, 10, 10, 10 ) );
+        planeModel = Raylib.LoadModelFromMesh(Raylib.GenMeshPlane( 50, 50, 10, 10 ) );
         Raylib.SetMaterialTexture(ref planeModel, 0, MaterialMapIndex.Diffuse, ref texture);
         
         plane = World.CreateRigidBody();
-        plane.AddShape( new BoxShape( 10 ) );
+        plane.AddShape( new BoxShape( 50, 10, 50 ) );
         plane.Position = new JVector( 0, -5, 0 );
         plane.MotionType = MotionType.Static;
 
-    }
 
-    /*
-    public void AddScene( Object o ) {
-        
-    }
-
-    public void RemoveScene( Object o ) {
-
-        Object? toDelete = null;
-
-        foreach( RigidBody r in World.RigidBodies ) {
+        Player = new Player( this ).Configure<Player>( p => {
             
-            if( r.GetHashCode() == o.RigidBody.GetHashCode()) {
-                
-                toDelete = o;
-                
-                break;
-            
-            }
+            // p.RigidBody.AffectedByGravity = false;
 
-        }
+            p.Camera = new() {
+                Position   = new( -15, 10, -15 ),
+                Target     = new Vector3( 10, 0, 10 ),
+                Up         = new Vector3( 0.0f, 1.0f, 0.0f ),
+                FovY       = 45.0f,
+                Projection = CameraProjection.Perspective
+            };
 
-        if( toDelete == null ) return;
+            p.CameraOffset = new( 0, 1, 0 );
 
-        /// Remove Event
+            p.RigidBody.AddShape( new BoxShape( 1, 2, 1 ) );
 
-        World.Remove( toDelete.RigidBody );
+        });
+
+        Room = new Room( this ).Configure<Room>( o => {
+
+            o.RigidBody.MotionType = MotionType.Static;
+            o.RigidBody.Position   = new( 20, 0, 0 );
+
+            o.Model = Model3D.Get( Model3D.Names.Null );
+
+            Utils.CreateMapCollider( o.Model, o.RigidBody );
+
+        });
 
     }
-    */
 
     public void AddScene( Object o ) {
 
@@ -114,9 +106,12 @@ public class Map {
         });
 
     }
+
     public void ExecuteActions() {
 
         foreach( Action action in Actions ) action();
+
+        Actions.Clear();
 
     }
 
@@ -134,18 +129,35 @@ public class Map {
 
     }
 
-    public void Update( float delta ) {
-        
+    public void ExecuteKeys( float delta ) {
+
+    }
+
+    public void Step( float delta ) {
+
+        World.Step( delta, true );
+        World.Step( delta, true );
+    }
+
+    public void Update() {
+
+        float delta = Raylib.GetFrameTime();
         Raylib.ClearBackground( Color.Black );
 
         ExecuteActions();
-        
-        World.Step( delta, true );
 
-        Raylib.BeginMode3D( camera );
+        ExecuteKeys( delta );
+
+        Player.Update( delta );
+
+        Step( delta );
+  
+        Raylib.BeginMode3D( Player.Camera );
         {
 
             Raylib.DrawModel( planeModel, Vector3.Zero, 1.0f, Color.White );
+
+            Raylib.DrawModel( Room.Model, Room.RigidBody.Position, 1, Color.White );
 
             foreach( Object o in Scene ) {
                 
@@ -153,10 +165,10 @@ public class Map {
 
             }
 
-
         }
         Raylib.EndMode3D();
 
+        Raylib.DrawFPS( 50, 50 );
 
     }
 

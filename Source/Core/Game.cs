@@ -5,10 +5,9 @@ public class Game {
 
     public static Map Map = new(); 
 
-    public static void Update( float dt ) {
+    public static void Update() {
         
-        Map.Update( dt );
-        // Raylib.DrawText("Hello, World!", 100, 100, 20, Color.White );
+        Map.Update();
 
     }
     
