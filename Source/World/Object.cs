@@ -2,7 +2,7 @@ using Jitter2.Collision.Shapes;
 using Jitter2.Dynamics;
 using Raylib_cs;
 
-public class Object : GenericEntity {
+public class Object: GenericEntity {
     
     public Material Material = Raylib.LoadMaterialDefault();
     
@@ -10,13 +10,7 @@ public class Object : GenericEntity {
 
     public Object( Map map ) : base( map ) {
 
-        Texture2D t = Texture.Get( Texture.Name.Missing );
-        Raylib.SetMaterialTexture(ref Material, MaterialMapIndex.Diffuse, t);
-
-        Mesh = Raylib.GenMeshCube( 1, 1, 1 );
-
-        RigidBody.AddShape( new BoxShape( 1 ) );
-        RigidBody.Position   = new( 0, -5, 0 );
+    
 
     }
 
@@ -33,7 +27,7 @@ public class Object : GenericEntity {
     }
     
     public override void Render() {
-        
+        Raylib.DrawMesh( Mesh, Material, Utils.MatrixTransformRigidBody( RigidBody ) );
     }
 
 }

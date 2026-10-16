@@ -3,7 +3,7 @@ using Raylib_cs;
 
 public class PlayerController {
     
-    static PlayerController Instance;
+    static PlayerController Instance = null!;
 
     Player p;
 

@@ -48,8 +48,8 @@ public class Player : GenericEntity {
 
         pc.ProcessUpKeys();
 
-        Vector3 right       = Vector3.Normalize( Vector3.Cross( Forward, Vector3.UnitY ) );
-        Vector3 forwardFlat = Vector3.Normalize( new Vector3(Forward.X, 0, Forward.Z) );
+        Vector3 right       = Vector3.Normalize( Vector3.Cross( Forward, Vector3.UnitY  ) );
+        Vector3 forwardFlat = Vector3.Normalize(   new Vector3( Forward.X, 0, Forward.Z ) );
 
         Vector3 force = new();
 
@@ -62,8 +62,6 @@ public class Player : GenericEntity {
         RigidBody.ApplyImpulse( force );
 
         UpdateCamera( Forward );
-
-        Console.WriteLine( RigidBody.Velocity.Length() );
 
     }
 
@@ -86,8 +84,6 @@ public class Player : GenericEntity {
         }
 
     }
-
-
 
     public void UpdateCamera( Vector3 forward ) {
  
