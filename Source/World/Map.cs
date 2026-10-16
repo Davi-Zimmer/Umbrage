@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using Jitter2;
 using Jitter2.Collision.Shapes;
 using Jitter2.Dynamics;
@@ -11,12 +12,8 @@ public class Map {
     public World World = new();
     private List<Object> Scene = new();
     private List<Action> Actions = new();
-    RigidBody plane;
-    Model planeModel;
 
-    Player Player;
-    Model Model;
-    Vector3 ModelPosition;
+    public Player Player;
 
     Room Room;
 
@@ -24,26 +21,50 @@ public class Map {
 
         World.SubstepCount = 4;
 
-        World.Gravity = new( 0, -9, 0 );
+        World.Gravity = new( 0, -5, 0 );
+
+        AddScene( new Enemy( this ).Configure<Enemy>( e => {
+            e.Model = Model3D.Get( Model3D.Names.Enemy );
+            e.RigidBody.Position = new( 0, 40, 0 );
+            e.RigidBody.AddShape( new BoxShape( 1 ) );
+
+        }));
 
         for( int i = 0; i < 10; i++ ) {
             
             AddScene( new Object( this ).Configure<Object>( o => {
+
                 o.RigidBody.AddShape( new BoxShape( 1 ) );
+
                 o.RigidBody.Position = new( 0, 10 + i * 2 + .5f, 0 );
+
+                Texture2D t = Texture.Get( Texture.Name.Missing );
+
+                Raylib.SetMaterialTexture(ref o.Material, MaterialMapIndex.Diffuse, t);
+                
+                o.Mesh = Raylib.GenMeshCube( 1, 1, 1 );
+
             }));
 
         }
 
-        Texture2D texture = Texture.Get( Texture.Name.Ground );
-        planeModel = Raylib.LoadModelFromMesh(Raylib.GenMeshPlane( 50, 50, 10, 10 ) );
-        Raylib.SetMaterialTexture(ref planeModel, 0, MaterialMapIndex.Diffuse, ref texture);
-        
-        plane = World.CreateRigidBody();
-        plane.AddShape( new BoxShape( 50, 10, 50 ) );
-        plane.Position = new JVector( 0, -5, 0 );
-        plane.MotionType = MotionType.Static;
+        AddScene( new Object( this ).Configure<Object>( o => {
+            
+            Vector3 size = new(50, 10, 50 );
 
+            o.RigidBody.AddShape( new BoxShape( size ) );
+
+            o.RigidBody.Position = new( 0, -5, 0 );
+
+            Texture2D t = Texture.Get( Texture.Name.Ground );
+
+            Raylib.SetMaterialTexture(ref o.Material, MaterialMapIndex.Diffuse, t);
+                
+            o.Mesh = Raylib.GenMeshCube( size.X, size.Y, size.Z );
+
+            o.RigidBody.MotionType = MotionType.Static;
+        
+        }));
 
         Player = new Player( this ).Configure<Player>( p => {
             
@@ -73,6 +94,26 @@ public class Map {
             Utils.CreateMapCollider( o.Model, o.RigidBody );
 
         });
+
+        AddScene( new Object( this ).Configure<Object>( o => {
+            
+            Vector3 size = new( 20f, 20f, 10f);
+
+            o.RigidBody.ClearShapes();
+
+            o.RigidBody.Position = new( 20, 20, 20 );
+
+            o.RigidBody.AddShape( new BoxShape( size ) );
+
+            o.Mesh = Raylib.GenMeshCube( size.X, size.Y, size.Z );
+
+            o.RigidBody.MotionType = MotionType.Static;
+
+            Texture2D t = Texture.Create( 20, 1, Color.Red, Color.White, out _ );
+
+            Raylib.SetMaterialTexture( ref o.Material, MaterialMapIndex.Diffuse, t );
+
+        }));
 
     }
 
@@ -115,28 +156,16 @@ public class Map {
 
     }
 
-    public Matrix4x4 MatrixTransform( RigidBody b ) {
-
-        JMatrix ori = JMatrix.CreateFromQuaternion( b.Orientation );
-        JVector pos = b.Position;
-
-        return new Matrix4x4(
-            ori.M11, ori.M12, ori.M13, pos.X,
-            ori.M21, ori.M22, ori.M23, pos.Y,
-            ori.M31, ori.M32, ori.M33, pos.Z,
-            0, 0, 0, 1.0f
-        );
-
-    }
 
     public void ExecuteKeys( float delta ) {
-
+        
     }
 
     public void Step( float delta ) {
 
         World.Step( delta, true );
         World.Step( delta, true );
+
     }
 
     public void Update() {
@@ -148,21 +177,21 @@ public class Map {
 
         ExecuteKeys( delta );
 
+        Step( delta );
+
         Player.Update( delta );
 
-        Step( delta );
-  
         Raylib.BeginMode3D( Player.Camera );
         {
 
-            Raylib.DrawModel( planeModel, Vector3.Zero, 1.0f, Color.White );
+            //Raylib.DrawModel( planeModel, Vector3.Zero, 1.0f, Color.White );
 
             Raylib.DrawModel( Room.Model, Room.RigidBody.Position, 1, Color.White );
 
             foreach( Object o in Scene ) {
-                
-                Raylib.DrawMesh( o.Mesh, o.Material, MatrixTransform( o.RigidBody ) );
 
+                o.Update( delta );                
+                
             }
 
         }

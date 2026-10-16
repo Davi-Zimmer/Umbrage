@@ -6,7 +6,11 @@ public class GenericEntity {
 
     public RigidBody RigidBody;
 
+    public Map Map;
+
     public GenericEntity( Map map ) {
+
+        Map = map;
 
         RigidBody = map.World.CreateRigidBody();
 
