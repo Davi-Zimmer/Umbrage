@@ -1,11 +1,24 @@
+using Jitter2.Collision.Shapes;
+using Jitter2.Dynamics;
 using Raylib_cs;
 
 public class Object {
     
-    Mesh Mesh = Raylib.GenMeshCube( 1, 1, 1 );
+    public Material Material = Raylib.LoadMaterialDefault();
+    public RigidBody RigidBody;
+    public Mesh Mesh;
 
-    public Object() {
-        
+    public Object( Map map ) {
+
+        Texture2D t = Texture.Get( Texture.Name.Missing );
+        Raylib.SetMaterialTexture(ref Material, MaterialMapIndex.Diffuse, t);
+        RigidBody = map.World.CreateRigidBody();
+
+        Mesh = Raylib.GenMeshCube( 1, 1, 1 );
+
+        RigidBody.AddShape( new BoxShape( 1 ) );
+        RigidBody.Position   = new( 0, -5, 0 );
+
     }
 
     public T Configure<T>( Action<T> cb ) where T: Object {

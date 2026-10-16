@@ -7,7 +7,7 @@ public class Texture {
     public static void Load() {
 
         AddTexture( Name.Ground , MissingTexture( 10, 1, Color.Gray   , Color.DarkGray ) );
-        AddTexture( Name.Missing, MissingTexture( 10, 1, Color.Magenta, Color.Black ) );
+        AddTexture( Name.Missing, MissingTexture( 2 , 1, Color.Magenta, Color.Black    ) );
 
     }
 
@@ -16,8 +16,6 @@ public class Texture {
         Image img = Raylib.GenImageChecked( size, size, checks, checks, a, b );
         
         Texture2D texture = Raylib.LoadTextureFromImage( img );
-        
-        Raylib.UnloadTexture( texture );
         
         return texture;
     }
@@ -33,6 +31,12 @@ public class Texture {
             Raylib.UnloadTexture( item.Value );
 
         }
+
+    }
+
+    public static Texture2D Get( Name name ) {
+        
+        return Loaded.TryGetValue( name, out _ ) ? Loaded[ name ] : Loaded[ Name.Missing ];
 
     }
 
