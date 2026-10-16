@@ -3,7 +3,7 @@ using Raylib_cs;
 public class Window {
 
     public static void Config() {
-
+            
         Raylib.SetConfigFlags(
             // ConfigFlags.MaximizedWindow |
             // ConfigFlags.MinimizedWindow |
@@ -11,14 +11,16 @@ public class Window {
             // | ConfigFlags.Msaa4xHint
             
         );
-        
+
         Raylib.InitWindow( 900, 600, "Umbrage" );
 
-        Raylib.SetTargetFPS( 60 );
+        Raylib.DisableCursor();
+
+        Raylib.SetTargetFPS( 100 );
 
     }
     
-    public delegate void Update( float delta );
+    public delegate void Update();
 
     public static void StartUpdate( Update update ) {
 
@@ -26,7 +28,7 @@ public class Window {
             
             Raylib.BeginDrawing();
             
-            update( Raylib.GetFrameTime() );
+            update();
 
             Raylib.EndDrawing();
 
