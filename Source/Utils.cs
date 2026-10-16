@@ -80,7 +80,7 @@ class Utils {
             (ps: sei que é desproporcional o erro e a sentença então um ajuste,
             deveria condenar ele programar tudo com um pc de 2048kb de ram 8bits e 6hz )
         */
-        return Raymath.MatrixRotateY( x * Raylib.DEG2RAD);
+        return Raymath.MatrixRotateY( x * Raylib.DEG2RAD );
 
         /*
         Matrix4x4 rotX = Raymath.MatrixRotateX(x * Raylib.DEG2RAD);
@@ -91,6 +91,30 @@ class Utils {
             Raymath.MatrixMultiply(rotY, rotZ)
         );
         */
+    }
+
+    public static Matrix4x4 MatrixRotateY( float y ) {
+      
+        return Raymath.MatrixRotateX( y * Raylib.DEG2RAD );
+
+        /*
+        Matrix4x4 rotX = Raymath.MatrixRotateX(x * Raylib.DEG2RAD);
+        Matrix4x4 rotY = Raymath.MatrixRotateY(y * Raylib.DEG2RAD);
+        Matrix4x4 rotZ = Raymath.MatrixRotateZ(z * Raylib.DEG2RAD);
+        Matrix4x4 rotation = Raymath.MatrixMultiply(
+            rotX,
+            Raymath.MatrixMultiply(rotY, rotZ)
+        );
+        */
+    }
+
+    public static Matrix4x4 MatrixRotateXY( float x, float y ) {
+        
+        return Matrix4x4.Multiply(
+            MatrixRotateX( x ),
+            MatrixRotateY( y )
+        );
+
     }
 
 }

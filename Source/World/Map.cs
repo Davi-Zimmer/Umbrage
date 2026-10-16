@@ -1,10 +1,7 @@
 using System.Numerics;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using Jitter2;
 using Jitter2.Collision.Shapes;
 using Jitter2.Dynamics;
-using Jitter2.LinearMath;
 using Raylib_cs;
 
 public class Map {
@@ -44,6 +41,8 @@ public class Map {
                 
                 o.Mesh = Raylib.GenMeshCube( 1, 1, 1 );
 
+                o.RigidBody.SetMassInertia( 10 );
+
             }));
 
         }
@@ -74,7 +73,7 @@ public class Map {
                 Position   = new( -15, 10, -15 ),
                 Target     = new Vector3( 10, 0, 10 ),
                 Up         = new Vector3( 0.0f, 1.0f, 0.0f ),
-                FovY       = 45.0f,
+                FovY       = 80.0f,
                 Projection = CameraProjection.Perspective
             };
 
@@ -190,7 +189,10 @@ public class Map {
 
             foreach( Object o in Scene ) {
 
-                o.Update( delta );                
+                o.Update( delta );
+
+
+                // if( o is Projectile ) Console.WriteLine("PROJECTILE");               
                 
             }
 
@@ -202,3 +204,17 @@ public class Map {
     }
 
 }
+
+/*
+Vector3 direction = GetDirection(yaw, pitch);
+
+Vector3 spawnPosition = playerPosition;
+Vector3 velocity = direction * projectileSpeed;
+Vector3 acceleration = direction * projectileAcceleration;
+
+Projectile projectile = new Projectile(
+    spawnPosition,
+    velocity,
+    acceleration
+);
+*/

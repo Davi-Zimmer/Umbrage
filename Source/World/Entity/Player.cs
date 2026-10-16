@@ -9,8 +9,8 @@ public class Player : GenericEntity {
     public int DashCooldown = 0;
     public int MaxDash = 3;
     public int DashCount = 0;
-    public float DashSpeed = 30f;
-    public float JumpMultiplyer = 15;
+    public float DashSpeed = 50f;
+    public float JumpMultiplyer = 10;
     public float Yaw = 0;
     public float Pitch = 0;
     public float Speed = 2;
@@ -22,7 +22,7 @@ public class Player : GenericEntity {
 
     public Vector3 Forward = new();
 
-    public Player( Map map ) : base( map ) {
+    public Player( Map map ): base( map ) {
         
         RigidBody.SetMassInertia( 10 );
 
