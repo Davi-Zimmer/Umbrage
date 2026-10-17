@@ -1,4 +1,5 @@
 using System.Numerics;
+using Jitter2.Collision.Shapes;
 using Jitter2.Dynamics;
 using Raylib_cs;
 
@@ -19,6 +20,9 @@ public class Player : GenericEntity {
     public bool CanDash = true;
 
     public Vector3 CameraOffset = new();
+    public Bar Health = new( 100 );
+
+    public int DamageFactor = 5;
 
     public Vector3 Forward = new();
 
@@ -80,9 +84,23 @@ public class Player : GenericEntity {
         DashCooldownCount = Math.Max( DashCooldownCount - 1, 0 );
 
         if( Raylib.IsMouseButtonPressed( MouseButton.Right ) ) {
-            RigidBody.AddForce( (0, JumpMultiplyer*Speed * 100, 0));
+            RigidBody.AddForce( ( 0, JumpMultiplyer*Speed * 100, 0 ) );
         }
 
+        if( Raylib.IsMouseButtonPressed( MouseButton.Left ) ) Shot();
+
+    }
+
+    public void Shot() {
+        
+        Vector3 from = RigidBody.Position + CameraOffset;
+
+        Map.RayCastRigidBody( from, Forward, e => {
+            
+            e.Health.Decrease( DamageFactor );
+
+        } );
+      
     }
 
     public void UpdateCamera( Vector3 forward ) {

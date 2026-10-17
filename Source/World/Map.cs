@@ -155,6 +155,42 @@ public class Map {
 
     }
 
+    public CastEntity RayCast( Vector3 from, Vector3 to ) {
+    
+        return new( from, to, World );
+
+    }
+    public delegate void FindEByRigidBodyCallback( Enemy entity );
+
+    public void FindEnemyByRigidBody( RigidBody body, FindEByRigidBodyCallback cb ) {
+
+        foreach ( GenericEntity e in Scene ) {
+            
+            if( e.RigidBody == body ) {
+
+                if( e is Enemy ) cb( ( e as Enemy )! );
+
+            }
+
+        }
+
+    }
+
+    public void RayCastRigidBody( Vector3 from, Vector3 to, FindEByRigidBodyCallback cb ) {
+        
+        RayCast( from, to ).then( shape => {
+
+
+            FindEnemyByRigidBody( shape.RigidBody, e => {
+                
+              
+                cb( e ); 
+
+            });
+
+        });
+
+    }
 
     public void ExecuteKeys( float delta ) {
         
