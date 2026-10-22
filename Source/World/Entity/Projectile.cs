@@ -4,9 +4,9 @@ using Raylib_cs;
 
 public class Projectile: Object {
     
-    Object Sender;
+    Enemy Sender;
 
-    public Projectile( Map map, Object sender ): base( map ) {
+    public Projectile( Map map, Enemy sender ): base( map ) {
         
         Sender = sender;
 
