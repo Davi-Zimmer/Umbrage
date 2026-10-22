@@ -3,35 +3,29 @@ using Jitter2.Collision.Shapes;
 using Jitter2.Dynamics;
 using Raylib_cs;
 
-public class Player : GenericEntity {
+public class Player : Entity {
     
     public Camera3D Camera;
     public int DashCooldownCount = 0;
     public int DashCooldown = 0;
-    public int MaxDash = 3;
-    public int DashCount = 0;
-    public float DashSpeed = 50f;
+
     public float JumpMultiplyer = 10;
-    public float Yaw = 0;
-    public float Pitch = 0;
-    public float Speed = 2;
     public bool CanJump = true;
     public bool Walled = false;
     public bool Grounded = false;
     public bool CanDash = true;
 
     public Vector3 CameraOffset = new();
-    public Bar Health = new( 100 );
 
     public int DamageFactor = 5;
-
-    public Vector3 Forward = new();
 
     public Player( Map map ): base( map ) {
         
         RigidBody.SetMassInertia( 10 );
 
         PlayerController.Begin( this );
+
+        Speed = 2;
 
         RigidBody.Damping = new( .002f, .001f  );
 

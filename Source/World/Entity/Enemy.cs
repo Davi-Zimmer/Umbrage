@@ -3,16 +3,11 @@ using Jitter2.Collision.Shapes;
 using Jitter2.Dynamics;
 using Raylib_cs;
 
-public class Enemy: Object {
+public class Enemy: Entity {
 
     public Model Model = new();
     public Vector3 RenderOffset = new( 0, -.5f, 0 );
     
-    public float Pitch = 0;
-    public float Yaw = 0;
-
-    public Bar Health = new( 100 );
-
     public Enemy( Map map ): base( map ) {
 
         Health.DecreaseObserver.Add( () => {
@@ -24,6 +19,8 @@ public class Enemy: Object {
             Game.SetStatus( Game.Status.Win );
 
         });
+
+        EntityController.Begin( this );
 
     }
 
@@ -43,13 +40,31 @@ public class Enemy: Object {
     }
 
     public override void Tick( float dt ) {
-
+        /*
         LookAt( Map.Player.RigidBody.Position, out Yaw, out Pitch );
 
+        */
         Model.Transform = Matrix4x4.CreateRotationY( Yaw ) * Matrix4x4.CreateRotationX( -Pitch );
-
+        
         if( Raylib.IsKeyPressed( KeyboardKey.R ) ) ShotForward();
 
+
+        EntityController ec = EntityController.Get();
+        Forward = ec.GetForward();
+
+        if( Raylib.IsKeyDown( KeyboardKey.Up   ) ) RigidBody.ApplyImpulse(  Forward * Speed * .1f ); 
+        if( Raylib.IsKeyDown( KeyboardKey.Down ) ) RigidBody.ApplyImpulse( -Forward * Speed * .1f ); 
+    
+        if( Raylib.IsKeyDown( KeyboardKey.Left  ) ) ec.Move( false, .1f );
+        if( Raylib.IsKeyDown( KeyboardKey.Right ) ) ec.Move( true , .1f );
+
+        float t = .01f;
+
+        if( Raylib.IsKeyDown( KeyboardKey.Kp4 ) )  Yaw += t;
+        if( Raylib.IsKeyDown( KeyboardKey.Kp6  ) ) Yaw -= t;
+
+        if( Raylib.IsKeyDown( KeyboardKey.Kp8 ) )  Pitch += t;
+        if( Raylib.IsKeyDown( KeyboardKey.Kp2  ) ) Pitch -= t;
     }
 
     public void ShotForward() {
