@@ -1,4 +1,6 @@
 using System.Numerics;
+using Jitter2.Collision.Shapes;
+using Jitter2.Dynamics;
 using Raylib_cs;
 
 public class Enemy: Object {
@@ -9,7 +11,19 @@ public class Enemy: Object {
     public float Pitch = 0;
     public float Yaw = 0;
 
+    public Bar Health = new( 100 );
+
     public Enemy( Map map ): base( map ) {
+
+        Health.DecreaseObserver.Add( () => {
+
+            if( Health.Value != 0 ) return;
+
+            Map.RemoveScene( RigidBody );
+
+            Game.SetStatus( Game.Status.Win );
+
+        });
 
     }
 
@@ -47,10 +61,11 @@ public class Enemy: Object {
              MathF.Cos( Yaw ) * MathF.Cos( Pitch )
         ) * speed;
 
-        Projectile projectile = new Projectile( Map ).Configure<Projectile>( p => {
+        Projectile projectile = new Projectile( Map, this ).Configure<Projectile>( p => {
             p.RigidBody.Position = RigidBody.Position;  
             p.RigidBody.Velocity = velocity;
             p.RigidBody.AffectedByGravity = false;
+            p.RigidBody.AddShape( new BoxShape( .1f ) );
 
         });
 
@@ -74,28 +89,3 @@ public class Enemy: Object {
     } 
 
 }
-
-
-/*
-    float yawRad   = Yaw   * MathF.PI / 180f;
-    float pitchRad = Pitch * MathF.PI / 180f;
-
-    float x = MathF.Sin( yawRad   ) * MathF.Cos( pitchRad );
-    float y = MathF.Sin( pitchRad );
-    float z = MathF.Cos( yawRad   ) * MathF.Cos( pitchRad );
-
-    Vector3 t = new( x, y, z );
-
-    int speed  = 10;
-
-    t *= speed;
-
-    Projectile projectile = new Projectile( Map ).Configure<Projectile>( p => {
-        p.RigidBody.Position = RigidBody.Position;  
-        p.RigidBody.Velocity = t;
-        p.RigidBody.AffectedByGravity = false;
-
-    });
-
-    Map.AddScene( projectile );
-*/
