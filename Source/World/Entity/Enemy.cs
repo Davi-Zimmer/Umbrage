@@ -1,4 +1,6 @@
 using System.Numerics;
+using Jitter2.Collision.Shapes;
+using Jitter2.Dynamics;
 using Raylib_cs;
 
 public class Enemy: Object {
@@ -17,7 +19,9 @@ public class Enemy: Object {
 
             if( Health.Value != 0 ) return;
 
-            Console.WriteLine("DEAD");
+            Map.RemoveScene( RigidBody );
+
+            Game.SetStatus( Game.Status.Win );
 
         });
 
@@ -57,10 +61,11 @@ public class Enemy: Object {
              MathF.Cos( Yaw ) * MathF.Cos( Pitch )
         ) * speed;
 
-        Projectile projectile = new Projectile( Map ).Configure<Projectile>( p => {
+        Projectile projectile = new Projectile( Map, this ).Configure<Projectile>( p => {
             p.RigidBody.Position = RigidBody.Position;  
             p.RigidBody.Velocity = velocity;
             p.RigidBody.AffectedByGravity = false;
+            p.RigidBody.AddShape( new BoxShape( .1f ) );
 
         });
 

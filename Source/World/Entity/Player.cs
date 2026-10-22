@@ -16,6 +16,7 @@ public class Player : GenericEntity {
     public float Pitch = 0;
     public float Speed = 2;
     public bool CanJump = true;
+    public bool Walled = false;
     public bool Grounded = false;
     public bool CanDash = true;
 
@@ -33,6 +34,15 @@ public class Player : GenericEntity {
         PlayerController.Begin( this );
 
         RigidBody.Damping = new( .002f, .001f  );
+
+        Health.DecreaseObserver.Add( () => {
+
+            if( Health.Value == 0 ) {
+
+                Game.SetStatus( Game.Status.Defeat );
+            }
+
+        });
 
     }
 
@@ -68,8 +78,9 @@ public class Player : GenericEntity {
         UpdateCamera( Forward );
 
     }
-
     public override void Tick( float dt ) {
+        
+        Touching( out Grounded, out Walled );
         
         PlayerController pc = PlayerController.Get();
         
@@ -89,6 +100,7 @@ public class Player : GenericEntity {
 
         if( Raylib.IsMouseButtonPressed( MouseButton.Left ) ) Shot();
 
+
     }
 
     public void Shot() {
@@ -96,7 +108,7 @@ public class Player : GenericEntity {
         Vector3 from = RigidBody.Position + CameraOffset;
 
         Map.RayCastRigidBody( from, Forward, e => {
-            
+            Console.Write( "HIT ");
             e.Health.Decrease( DamageFactor );
 
         } );
@@ -112,19 +124,28 @@ public class Player : GenericEntity {
 
     public void CheckJumpReset() {
         
-        Grounded = IsGrounded();
-
         if( Grounded ) DashCount = 0;
 
     }
 
-    bool IsGrounded(){
+    /// não sei como seria o termo correto pra "encostado na parede" XD
+    void Touching( out bool grounded, out bool walled ){
+
+        grounded = false;
+        walled   = false;
 
         foreach( var arbiter in RigidBody.Contacts ) {
 
             ref var data = ref arbiter.Handle.Data;
 
-            if( data.Contact0.Normal.Y <= 1f ) return true;
+            var normal = data.Contact0.Normal;
+
+            if( arbiter.Body1 == RigidBody ) normal = -normal;
+
+            if( normal.Y > 0.7f )  grounded = true;
+
+            if( MathF.Abs( normal.Y ) < 0.2f ) walled = true;
+
             // if( ( data.UsageMask & 1 ) != 0 && data.Contact0.Normal.Y < -0.5f ) return true;
             // if( ( data.UsageMask & 2 ) != 0 && data.Contact1.Normal.Y < -0.5f ) return true;
             // if( ( data.UsageMask & 4 ) != 0 && data.Contact2.Normal.Y < -0.5f ) return true;
@@ -132,7 +153,8 @@ public class Player : GenericEntity {
 
         }
 
-        return false;
+        
+
     }
 
 }

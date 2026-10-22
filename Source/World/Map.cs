@@ -7,7 +7,7 @@ using Raylib_cs;
 public class Map {
 
     public World World = new();
-    private List<Object> Scene = new();
+    private List<GenericEntity> Scene = new();
     private List<Action> Actions = new();
 
     public Player Player;
@@ -15,7 +15,7 @@ public class Map {
     Room Room;
 
     public Map(){
-
+        
         World.SubstepCount = 4;
 
         World.Gravity = new( 0, -5, 0 );
@@ -94,6 +94,8 @@ public class Map {
 
         });
 
+        AddScene( Player );
+
         AddScene( new Object( this ).Configure<Object>( o => {
             
             Vector3 size = new( 20f, 20f, 10f);
@@ -116,7 +118,7 @@ public class Map {
 
     }
 
-    public void AddScene( Object o ) {
+    public void AddScene( GenericEntity o ) {
 
         Actions.Add( () => Scene.Add( o ) );              
 
@@ -125,9 +127,9 @@ public class Map {
     public void RemoveScene( RigidBody body ) {
         Actions.Add(() => {
            
-           Object? toDelete = null;
+           GenericEntity? toDelete = null;
 
-            foreach( Object o in Scene ) {
+            foreach( GenericEntity o in Scene ) {
                 
                 if( o.RigidBody.GetHashCode() == body.GetHashCode()) {
                     
@@ -160,19 +162,26 @@ public class Map {
         return new( from, to, World );
 
     }
+
     public delegate void FindEByRigidBodyCallback( Enemy entity );
 
     public void FindEnemyByRigidBody( RigidBody body, FindEByRigidBodyCallback cb ) {
 
-        foreach ( GenericEntity e in Scene ) {
+        GenericEntity? o = FindObjectByRidigBody( body );
+
+        if( o is Enemy ) cb( ( o as Enemy )! );
+
+    }
+
+    public GenericEntity? FindObjectByRidigBody( RigidBody body ) {
+        
+        foreach( GenericEntity e in Scene ) {
             
-            if( e.RigidBody == body ) {
-
-                if( e is Enemy ) cb( ( e as Enemy )! );
-
-            }
+            if( e.RigidBody == body ) return e;
 
         }
+
+        return null;
 
     }
 
@@ -180,10 +189,8 @@ public class Map {
         
         RayCast( from, to ).then( shape => {
 
-
             FindEnemyByRigidBody( shape.RigidBody, e => {
-                
-              
+
                 cb( e ); 
 
             });
@@ -214,7 +221,7 @@ public class Map {
 
         Step( delta );
 
-        Player.Update( delta );
+        // Player.Update( delta );
 
         Raylib.BeginMode3D( Player.Camera );
         {
@@ -223,10 +230,9 @@ public class Map {
 
             Raylib.DrawModel( Room.Model, Room.RigidBody.Position, 1, Color.White );
 
-            foreach( Object o in Scene ) {
+            foreach( GenericEntity o in Scene ) {
 
                 o.Update( delta );
-
 
                 // if( o is Projectile ) Console.WriteLine("PROJECTILE");               
                 
@@ -235,22 +241,16 @@ public class Map {
         }
         Raylib.EndMode3D();
 
+
+        Vector2 c = Raylib.GetScreenCenter();
+
+        int a = 10;
+        Color color = Color.Pink;
+        Raylib.DrawLine( (int)c.X, (int)c.Y, (int)c.X - a, (int)c.Y + a, color);
+        Raylib.DrawLine( (int)c.X, (int)c.Y, (int)c.X + a, (int)c.Y + a, color);
+
         Raylib.DrawFPS( 50, 50 );
 
     }
 
 }
-
-/*
-Vector3 direction = GetDirection(yaw, pitch);
-
-Vector3 spawnPosition = playerPosition;
-Vector3 velocity = direction * projectileSpeed;
-Vector3 acceleration = direction * projectileAcceleration;
-
-Projectile projectile = new Projectile(
-    spawnPosition,
-    velocity,
-    acceleration
-);
-*/
