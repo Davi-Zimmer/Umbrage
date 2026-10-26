@@ -6,17 +6,23 @@ public class Bar {
 
     public Observer DecreaseObserver = new();
     public Observer IncreaseObserver = new();
-    public Observer MaxObserver      = new();
+    public Observer FilledObserver   = new();
+    public Observer ZeroObserver     = new();
     
     public Bar( int amount, int maxlife = 0 ) {
         
-        Max = maxlife == 0 ? amount : maxlife; 
-        
-        Value = amount;
+        //Max = maxlife == 0 ? amount : maxlife; 
+        // Value = amount;
+        Reset( amount, maxlife );
 
     }
 
     public void Set( int amount ) { Value = amount; }
+
+    public void Reset( int amount, int maxlife = 0 ) {
+        Max = maxlife == 0 ? amount : maxlife; 
+        Value = amount;
+    }
 
     public void Zero() { Value = 0; }
 
@@ -30,7 +36,7 @@ public class Bar {
 
         IncreaseObserver.Trigger();
 
-        if( Value == Max ) MaxObserver.Trigger();
+        if( Value == Max ) FilledObserver.Trigger();
 
     }
 
@@ -48,6 +54,8 @@ public class Bar {
         Value = Clamp( Value - amount, Max );
 
         DecreaseObserver.Trigger();
+
+        if( Value == 0 ) ZeroObserver.Trigger();
 
     }
 
@@ -68,7 +76,8 @@ public class BarF {
 
     public Observer DecreaseObserver = new();
     public Observer IncreaseObserver = new();
-    public Observer MaxObserver      = new();
+    public Observer FilledObserver   = new();
+    public Observer ZeroObserver     = new();
 
     public BarF( float amount, float maxlife = 0 ) {
         
@@ -76,9 +85,17 @@ public class BarF {
         
         Value = amount;
 
+        Reset( amount, maxlife );
+
     }
 
     public void Set( float amount ) { Value = amount; }
+    
+    public void Reset( float amount, float maxlife = 0 ) {
+        Max = maxlife == 0 ? amount : maxlife;
+        Value = amount;
+    }
+
     public void Zero() { Value = 0; }
     public void Fill() { Value = Max; }
 
@@ -90,7 +107,7 @@ public class BarF {
 
         IncreaseObserver.Trigger();
 
-        if( Value == Max ) MaxObserver.Trigger();
+        if( Value == Max ) FilledObserver.Trigger();
 
     }
     public void Change( float i ) {

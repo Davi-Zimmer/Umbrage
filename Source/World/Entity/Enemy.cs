@@ -10,16 +10,7 @@ public class Enemy: Entity {
     
     public Enemy( Map map ): base( map ) {
 
-        Health.DecreaseObserver.Add( () => {
-
-            if( Health.Value != 0 ) return;
-
-            Map.RemoveScene( RigidBody );
-
-            Game.SetStatus( Game.Status.Win );
-
-        });
-
+        
         EntityController.Begin( this );
 
     }

@@ -23,18 +23,18 @@ public class Game {
     }
 
     private static Tween dotCount = new Tween( 4, 1 ).Configure( t => {
-        t.MaxObserver.Add( () => t.Zero() );
+        t.FilledObserver.Add( () => t.Zero() );
     });
 
     private static Tween count = new Tween( 50, 1 ).Configure( t => {
-        t.MaxObserver.Add( () => {
+        t.FilledObserver.Add( () => {
             dotCount.CallBehaivor( Tween.Grown );
             t.Zero();
         });
     });
 
     private static Tween delay = new Tween( 100, 1 ).Configure( t => {
-        t.MaxObserver.Add( () => {
+        t.FilledObserver.Add( () => {
             count.CallBehaivor( Tween.Grown );
         });
     });
