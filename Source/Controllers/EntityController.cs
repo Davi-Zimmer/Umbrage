@@ -2,7 +2,7 @@ using System.Numerics;
 
 public class EntityController {
     
-    private static EntityController Instance;
+    private static EntityController Instance = null!;
 
     public Entity e;
 
