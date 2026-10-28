@@ -7,7 +7,9 @@ public class Enemy: Entity {
 
     public Model Model = new();
     public Vector3 RenderOffset = new( 0, -.5f, 0 );
-    
+
+    public Material Material = Raylib.LoadMaterialDefault();
+
     public Enemy( Map map ): base( map ) {
 
         
@@ -62,9 +64,9 @@ public class Enemy: Entity {
         float speed = 20f;
 
         Vector3 velocity = new Vector3(
-            -MathF.Sin( Yaw ) * MathF.Cos( Pitch ),
-            -MathF.Sin( Pitch ),
-             MathF.Cos( Yaw ) * MathF.Cos( Pitch )
+           -MathF.Sin( Yaw ) * MathF.Cos( Pitch ),
+           -MathF.Sin( Pitch ),
+            MathF.Cos( Yaw ) * MathF.Cos( Pitch )
         ) * speed;
 
         Projectile projectile = new Projectile( Map, this ).Configure<Projectile>( p => {
@@ -80,13 +82,10 @@ public class Enemy: Entity {
     }
 
     public override void Render() {
-        
-        Raylib.DrawModel( 
-            Model,
-            GetRenderPosition(),
-            1,
-            Color.White
-        );
+
+        ShaderManager.SetShader( Model, ShaderManager.Lighting() );
+
+        Raylib.DrawModel( Model, GetRenderPosition(), 1, Color.White );
         
     }
 

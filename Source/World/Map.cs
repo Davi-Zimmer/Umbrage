@@ -9,10 +9,7 @@ public class Map {
     public World World = new();
     private List<GenericEntity> Scene = new();
     private List<Action> Actions = new();
-
     public Player Player;
-
-    Room Room;
 
     public Map(){
         
@@ -24,6 +21,8 @@ public class Map {
             e.Model = Model3D.Get( Model3D.Names.Enemy );
             e.RigidBody.Position = new( 0, 40, 0 );
             e.RigidBody.AddShape( new BoxShape( 1 ) );
+            Texture2D t = Texture.Get( Texture.Name.Missing );
+            Raylib.SetMaterialTexture(ref e.Material, MaterialMapIndex.Diffuse, t);
 
         }));
 
@@ -83,16 +82,16 @@ public class Map {
 
         });
 
-        Room = new Room( this ).Configure<Room>( o => {
+        AddScene(new Room( this ).Configure<Room>( o => {
+            // Raylib.DrawModel( Room.Model, Room.RigidBody.Position, 1, Color.White );
 
             o.RigidBody.MotionType = MotionType.Static;
             o.RigidBody.Position   = new( 20, 0, 0 );
-
             o.Model = Model3D.Get( Model3D.Names.Null );
 
             Utils.CreateMapCollider( o.Model, o.RigidBody );
 
-        });
+        }));
 
         AddScene( Player );
 
@@ -227,8 +226,6 @@ public class Map {
         {
 
             //Raylib.DrawModel( planeModel, Vector3.Zero, 1.0f, Color.White );
-
-            Raylib.DrawModel( Room.Model, Room.RigidBody.Position, 1, Color.White );
 
             foreach( GenericEntity o in Scene ) {
 
