@@ -1,22 +1,21 @@
+using System.Numerics;
+using Jitter2.Collision.Shapes;
+using Jitter2.Dynamics;
 using Raylib_cs;
 
-public class Object {
+public class Object: GenericEntity {
     
-    Mesh Mesh = Raylib.GenMeshCube( 1, 1, 1 );
+    public Material Material = Raylib.LoadMaterialDefault();
+    
+    public Mesh Mesh;
 
-    public Object() {
-        
+    public Object( Map map ) : base( map ) {
+
+    
+
     }
 
-    public T Configure<T>( Action<T> cb ) where T: Object {
-        
-        cb( (T)this );
-        
-        return (T)this;
-        
-    }
-
-    public void Update( float delta ) {
+    public override void Update( float delta ) {
         
         Tick( delta );
 
@@ -24,13 +23,16 @@ public class Object {
 
     }
 
-    public virtual void Tick( float dt ) {
+    public override void Tick( float dt ) {
         
     }
     
-    public virtual void Render() {
-        
-    }
+    public override void Render() {
 
+        Material.Shader = ShaderManager.Lighting();
+        
+        Raylib.DrawMesh( Mesh, Material, Utils.MatrixTransformRigidBody( RigidBody ) );
+
+    }
 
 }

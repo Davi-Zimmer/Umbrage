@@ -1,0 +1,154 @@
+using System.Numerics;
+using Jitter2.Collision.Shapes;
+using Jitter2.Dynamics;
+using Raylib_cs;
+
+public class Player : Entity {
+    
+    public Camera3D Camera;
+    public int DashCooldownCount = 0;
+    public int DashCooldown = 0;
+
+    public float JumpMultiplyer = 10;
+    public bool CanJump = true;
+    public bool Walled = false;
+    public bool Grounded = false;
+    public bool CanDash = true;
+
+    public Vector3 CameraOffset = new();
+
+    public int DamageFactor = 5;
+
+    public Player( Map map ): base( map ) {
+        
+        RigidBody.SetMassInertia( 10 );
+
+        PlayerController.Begin( this );
+
+        Speed = 2;
+
+        RigidBody.Damping = new( .002f, .001f  );
+
+        Health.DecreaseObserver.Add( () => {
+
+            if( Health.Value == 0 ) {
+
+                Game.SetStatus( Game.Status.Defeat );
+            }
+
+        });
+
+    }
+
+    public override void PosConfig() {
+
+        RigidBody.Position = Camera.Position;
+
+        Vector3 initialForward = Vector3.Normalize( Camera.Target - Camera.Position );
+
+        Yaw = MathF.Atan2( initialForward.X, initialForward.Z );
+
+        Pitch = MathF.Asin( initialForward.Y );
+
+    }
+
+    private void TickMovement( PlayerController pc, float dt ) {
+
+        pc.ProcessUpKeys();
+
+        Vector3 right       = Vector3.Normalize( Vector3.Cross( Forward, Vector3.UnitY  ) );
+        Vector3 forwardFlat = Vector3.Normalize(   new Vector3( Forward.X, 0, Forward.Z ) );
+
+        Vector3 force = new();
+
+        force += pc.CheckForwardDash( forwardFlat );
+
+        force += pc.GetJumpForce( Speed );
+
+        force += pc.GetMovementDirection( forwardFlat, right, Speed );
+
+        RigidBody.ApplyImpulse( force );
+
+        UpdateCamera( Forward );
+
+    }
+    public override void Tick( float dt ) {
+        
+        Touching( out Grounded, out Walled );
+        
+        PlayerController pc = PlayerController.Get();
+        
+        Forward = pc.GetForwardDelta();
+        
+        RigidBody.Velocity *= new Vector3( .9f, 1f, .9f );
+        
+        CheckJumpReset();
+
+        TickMovement( pc, dt );
+
+        DashCooldownCount = Math.Max( DashCooldownCount - 1, 0 );
+
+        if( Raylib.IsMouseButtonPressed( MouseButton.Right ) ) {
+            RigidBody.AddForce( ( 0, JumpMultiplyer*Speed * 100, 0 ) );
+        }
+
+        if( Raylib.IsMouseButtonPressed( MouseButton.Left ) ) Shot();
+
+
+    }
+
+    public void Shot() {
+        
+        Vector3 from = RigidBody.Position + CameraOffset;
+
+        Map.RayCastRigidBody( from, Forward, e => {
+            Console.Write( "HIT ");
+            e.Health.Decrease( DamageFactor );
+
+        } );
+      
+    }
+
+    public void UpdateCamera( Vector3 forward ) {
+ 
+        Camera.Position = RigidBody.Position + CameraOffset;
+        Camera.Target   = RigidBody.Position + CameraOffset + forward;
+
+    }
+
+    public void CheckJumpReset() {
+        
+        if( Grounded ) DashCount = 0;
+
+    }
+
+    /// não sei como seria o termo correto pra "encostado na parede" XD
+    void Touching( out bool grounded, out bool walled ){
+
+        grounded = false;
+        walled   = false;
+
+        foreach( var arbiter in RigidBody.Contacts ) {
+
+            ref var data = ref arbiter.Handle.Data;
+
+            var normal = data.Contact0.Normal;
+
+            if( arbiter.Body1 == RigidBody ) normal = -normal;
+
+            if( normal.Y > 0.7f )  grounded = true;
+
+            if( MathF.Abs( normal.Y ) < 0.2f ) walled = true;
+
+            // if( ( data.UsageMask & 1 ) != 0 && data.Contact0.Normal.Y < -0.5f ) return true;
+            // if( ( data.UsageMask & 2 ) != 0 && data.Contact1.Normal.Y < -0.5f ) return true;
+            // if( ( data.UsageMask & 4 ) != 0 && data.Contact2.Normal.Y < -0.5f ) return true;
+            // if( ( data.UsageMask & 8 ) != 0 && data.Contact3.Normal.Y < -0.5f ) return true;
+
+        }
+
+        
+
+    }
+
+}

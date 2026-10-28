@@ -1,3 +1,5 @@
 .editorconfig
 bin
 obj
+Assets/Private
+Ideias
