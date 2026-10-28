@@ -11,6 +11,9 @@
   <ItemGroup>
     <PackageReference Include="Jitter2" Version="2.8.13" />
     <PackageReference Include="Raylib-cs" Version="8.1.0" />
+    <None Update="Version.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
 
   </ItemGroup>
 
