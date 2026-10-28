@@ -1,3 +1,4 @@
+using System.Numerics;
 using Jitter2.Collision.Shapes;
 using Jitter2.Dynamics;
 using Raylib_cs;
@@ -27,7 +28,11 @@ public class Object: GenericEntity {
     }
     
     public override void Render() {
+
+        Material.Shader = ShaderManager.Lighting();
+        
         Raylib.DrawMesh( Mesh, Material, Utils.MatrixTransformRigidBody( RigidBody ) );
+
     }
 
 }

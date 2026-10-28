@@ -7,7 +7,7 @@ public class Model3D {
         [ Names.Enemy ] = "./Assets/Private/Enemy.glb"
     };
 
-    public static Dictionary< Names, Model > modelsss= new();
+    public static Dictionary< Names, Model > modelsss = new();
 
     public static void LoadModels() {
         foreach( var s in ModelPaths ) {

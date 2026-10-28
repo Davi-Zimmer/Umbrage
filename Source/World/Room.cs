@@ -8,4 +8,11 @@ public class Room : Object {
 
     }
 
+    public override void Render() {
+
+        ShaderManager.SetShader( Model, ShaderManager.Lighting() );
+
+        Raylib.DrawModel( Model, RigidBody.Position, 1, Color.White );
+    }
+
 }
