@@ -1,4 +1,6 @@
-﻿Window.Config();
+﻿Version.Load();
+
+Window.Config();
 
 Texture.Load();
 
