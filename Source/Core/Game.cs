@@ -1,10 +1,13 @@
+using System.ComponentModel;
 using System.Net;
 using System.Numerics;
+using Jitter2;
 using Raylib_cs;
 
 public class Game {
 
     public static Map Map = new();
+
     public static Status status = Status.Running;
 
     public enum Status {

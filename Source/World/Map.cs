@@ -8,11 +8,22 @@ public class Map {
 
     public World World = new();
     private List<GenericEntity> Scene = new();
+    private List<Light> Lights = new();
     private List<Action> Actions = new();
+
+    public float Ambient = 0;//0.12f;
+
     public Player Player;
+    public Sun Sun;
 
     public Map(){
-        
+
+        Sun = new Sun( this ).Configure<Sun>( s => {
+            
+        });
+
+        AddLight( Sun );
+
         World.SubstepCount = 4;
 
         World.Gravity = new( 0, -5, 0 );
@@ -148,6 +159,18 @@ public class Map {
 
     }
 
+    public void AddLight( Light l ) {
+
+        Actions.Add( () => Lights.Add( l ) );
+
+    }
+
+    public void RemoveLight( Light l ) {
+
+        Actions.Add( () => Lights.Remove( l ) );
+
+    }
+
     public void ExecuteActions() {
 
         foreach( Action action in Actions ) action();
@@ -227,13 +250,11 @@ public class Map {
 
             //Raylib.DrawModel( planeModel, Vector3.Zero, 1.0f, Color.White );
 
-            foreach( GenericEntity o in Scene ) {
+            foreach( GenericEntity o in Scene ) o.Update( delta );
+            
+            foreach( Light l in Lights ) l.Update( delta );
 
-                o.Update( delta );
 
-                // if( o is Projectile ) Console.WriteLine("PROJECTILE");               
-                
-            }
 
         }
         Raylib.EndMode3D();

@@ -6,7 +6,8 @@ public class Shaders {
 
     public enum Name {
         Basic,
-        Lighting
+        Lighting,
+        Halo,
     }
 
     public static Shader Get( Name name ) {
@@ -33,8 +34,10 @@ public class Shaders {
         string shadersFolder = "./Assets/Shaders/"; 
 
         Dictionary< Name, string > l = new() {
-            [ Name.Basic     ] = "Basic",
-            [ Name.Lighting ] = "Lighting"
+            [ Name.Basic    ] = "Basic",
+            [ Name.Lighting ] = "Lighting",
+            [ Name.Halo      ] = "Halo"
+
         };
 
         foreach( var e in l ) {
