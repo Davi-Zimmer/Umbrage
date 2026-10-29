@@ -4,45 +4,25 @@ using Raylib_cs;
 public class ShaderManager {
 
     public static Shader Lighting() {
-        Shader lightingShader     = Shaders.Get( Shaders.Name.Lighting );
-        int    lightPosLoc        = Raylib.GetShaderLocation( lightingShader, "lightPos" );
-        int    lightColorLoc      = Raylib.GetShaderLocation( lightingShader, "lightColor" );
-        int    ambientStrengthLoc = Raylib.GetShaderLocation( lightingShader, "ambientStrength" );
+        Shader shader     = Shaders.Get( Shaders.Name.Lighting );
+        int    lightPosLoc        = Raylib.GetShaderLocation( shader, "lightPos" );
+        int    lightColorLoc      = Raylib.GetShaderLocation( shader, "lightColor" );
+        int    ambientStrengthLoc = Raylib.GetShaderLocation( shader, "ambientStrength" );
+
+        int intensityLoc = Raylib.GetShaderLocation( shader, "lightIntensity" ); 
+        int rangeLoc = Raylib.GetShaderLocation( shader, "lightRange");
 
         float time = (float)Raylib.GetTime();
 
-        float radius = 12f;
-        float height = 8f;
-        float speed = 0.5f;
+        Sun sun = Game.Map.Sun;
 
-        float ambient = 0.12f; // mudar pra alguma classe de contexto
-
-        Vector3 lightColor = new Vector3( 1f, 0.82f, 0.55f );
-
-        Vector3 lightPos = new Vector3(
-            MathF.Cos(time * speed) * radius,
-            height,
-            MathF.Sin(time * speed) * radius
-        );
-
-        Raylib.SetShaderValue( lightingShader, lightPosLoc       , lightPos  , ShaderUniformDataType.Vec3  );
-        Raylib.SetShaderValue( lightingShader, lightColorLoc     , lightColor, ShaderUniformDataType.Vec3  );
-        Raylib.SetShaderValue( lightingShader, ambientStrengthLoc, ambient   , ShaderUniformDataType.Float );
+        Raylib.SetShaderValue( shader, lightPosLoc       , sun.GetLightPos(time) , ShaderUniformDataType.Vec3  );
+        Raylib.SetShaderValue( shader, lightColorLoc     , sun.FadeColor            , ShaderUniformDataType.Vec3  );
+        Raylib.SetShaderValue( shader, ambientStrengthLoc, Game.Map.Ambient      , ShaderUniformDataType.Float );
+        Raylib.SetShaderValue( shader, intensityLoc      , sun.Intensity         , ShaderUniformDataType.Float );
+        Raylib.SetShaderValue( shader, rangeLoc          , sun.LightDistance     , ShaderUniformDataType.Float );
         
-        /*
-        int lightDirectionLoc  = Raylib.GetShaderLocation( lightingShader, "lightDirection" );
-        int lightColorLoc      = Raylib.GetShaderLocation( lightingShader, "lightColor" );
-        int ambientStrengthLoc = Raylib.GetShaderLocation( lightingShader, "ambientStrength" );
-
-        // { -0.5f,  1.0f, -0.3f };
-        // { 1.0f, 0.95f, 0.85f };
-        // 0.15f;
-    
-        Raylib.SetShaderValue( lightingShader, lightDirectionLoc , lightDirectionArray , ShaderUniformDataType.Vec3  );
-        Raylib.SetShaderValue( lightingShader, lightColorLoc     , lightColorArray     , ShaderUniformDataType.Vec3  );
-        Raylib.SetShaderValue( lightingShader, ambientStrengthLoc, ambientStrength     , ShaderUniformDataType.Float );
-        */
-        return lightingShader;
+        return shader;
 
     }
 
@@ -52,7 +32,9 @@ public class ShaderManager {
             for( int i = 0; i < model.MaterialCount; i++ ) {
 
                 model.Materials[ i ].Shader = shader;
+
             }
+
         }
 
     }

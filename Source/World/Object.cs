@@ -9,7 +9,7 @@ public class Object: GenericEntity {
     
     public Mesh Mesh;
 
-    public Object( Map map ) : base( map ) {
+    public Object( Map map ): base( map ) {
 
     
 
