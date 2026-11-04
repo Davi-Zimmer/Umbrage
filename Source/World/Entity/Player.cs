@@ -103,12 +103,12 @@ public class Player : Entity {
         
         Vector3 from = RigidBody.Position + CameraOffset;
 
-        Map.RayCastRigidBody( from, Forward, e => {
+        Map.RayCastEntity<Kaneeth>( this, from, Forward, e => {
             Console.Write( "HIT ");
             e.Health.Decrease( DamageFactor );
 
         } );
-      
+        
     }
 
     public void UpdateCamera( Vector3 forward ) {
