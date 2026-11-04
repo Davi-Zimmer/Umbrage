@@ -88,8 +88,9 @@ public class PerceptronModule {
 
     }
 
-    // --------------------------------- Debug --------------------------------- \\
+    /// Fazer perceptron de audio
 
+    // --------------------------------- Debug --------------------------------- \\
 
     public void DebugVision() {
 
@@ -124,17 +125,16 @@ public class PerceptronModule {
             origin + forward * Kaneeth.VisionDistance,
             Color.Green
         );
-
         
-        Vector3 from = Kaneeth.RigidBody.Position;
-        Vector3 to = Game.Map.Player.RigidBody.Position - from;
+        Vector3 to = Game.Map.Player.RigidBody.Position - origin;
 
-         Raylib.DrawLine3D(
-            from,
-            to * Kaneeth.VisionDistance,
+        Raylib.DrawLine3D(
+            origin,
+            to,
             Color.Green
         );
 
     }
+
 
 }

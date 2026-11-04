@@ -2,13 +2,13 @@ using System.Numerics;
 using Raylib_cs;
 
 public class Kaneeth: Enemy {
-    PerceptronModule Perceptron;
-    K_Brain      Brain;
+    public PerceptronModule Perceptron;
+    public MemoryModule Memory;
+    public K_Brain      Brain;
 
     public float VisionAngle = 90f;
     public float VisionDistance = 15f;
     public int VisionSegments = 24;
-
 
     public Kaneeth( Map map ): base( map ) {
         Yaw   = 0;
@@ -30,6 +30,7 @@ public class Kaneeth: Enemy {
 
         Perceptron = new( this );
         Brain      = new( this );
+        Memory     = new( this );
 
     }
 
@@ -39,7 +40,12 @@ public class Kaneeth: Enemy {
 
         Perceptron.Tick( delta );
         
+        Memory.Tick();
 
+    }
+
+    private void UpdateMemory() {
+        
     }
 
     private void ExecuteKeys() {
@@ -68,6 +74,7 @@ public class Kaneeth: Enemy {
 
         //Console.Write( $"Pitch {Pitch}, Yaw: {Yaw}\n" );
     }
+
 
 
 }
