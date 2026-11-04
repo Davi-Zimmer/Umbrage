@@ -11,8 +11,9 @@ public class Kaneeth: Enemy {
 
 
     public Kaneeth( Map map ): base( map ) {
-        Yaw = 0;
-        Pitch=0;
+        Yaw   = 0;
+        Pitch = 0;
+        
         SetGameType( GameType.Kaneeth );
 
         Health.Reset( 1000 );

@@ -185,17 +185,24 @@ public class Map {
 
     public CastEntity RayCast( Vector3 from, Vector3 to ) {
     
-        return new( from, to, World );
+        return new( from, to );
 
     }
 
-    public delegate void FindEByRigidBodyCallback( Enemy entity );
+    public delegate void FindEByRigidBodyCallback<T>( T entity );
+    public delegate void ENotFound( GenericEntity? entity = null );
 
-    public void FindEnemyByRigidBody( RigidBody body, FindEByRigidBodyCallback cb ) {
+    public void FindEntityByRigidBody<T>( RigidBody body, FindEByRigidBodyCallback<T> cb, ENotFound? notFound = null) {
 
         GenericEntity? o = FindObjectByRidigBody( body );
 
-        if( o is Enemy ) cb( ( o as Enemy )! );
+        if( o is T genericEntity ) {
+            cb( genericEntity );
+            return;
+        }
+
+        if( notFound != null)  notFound!( o );
+
 
     }
 
@@ -211,17 +218,32 @@ public class Map {
 
     }
 
-    public void RayCastRigidBody( Vector3 from, Vector3 to, FindEByRigidBodyCallback cb ) {
-        
-        RayCast( from, to ).then( shape => {
+    public void RayCastEntity<T>( GenericEntity ignore, Vector3 from, Vector3 to, FindEByRigidBodyCallback<T> cb, ENotFound? notFound = null ) {
+        RayCast( from, to )
+        .Ignore( ignore.RigidBody )
+        .Start()
+        .Then( shape => {
+            FindEntityByRigidBody<T>( shape.RigidBody, entity => {
+                
+                cb( entity );
 
-            FindEnemyByRigidBody( shape.RigidBody, e => {
+            }, notFound );
+
+        });
+        
+        /*
+        RayCast( from, to )
+        .Ignore( ignore.RigidBody )
+        .Then( shape => {
+
+            FindEntityByRigidBody<T>( shape.RigidBody, e => {
 
                 cb( e ); 
 
-            });
+            }, notFound );
 
         });
+        */
 
     }
 

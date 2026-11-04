@@ -6,8 +6,8 @@ public class PerceptronModule {
     public float PlayerDistance  = 0;
     public bool PlayerInFOV = false;
     public Vector3 PlayerDirection = new();
-
-
+    public bool PlayerVisible = false;
+    public bool HasLineOfSight = false;
 
     private Kaneeth Kaneeth;
 
@@ -56,44 +56,58 @@ public class PerceptronModule {
         return dot >= threshold;
     }
 
+    public void UpdateLineOfSight() {
+        if( !PlayerInFOV ) {
+            HasLineOfSight = false;
+            PlayerVisible  = false;
+            return;
+        }
+
+        Vector3 from = Kaneeth.RigidBody.Position;
+        Vector3 to   = (Game.Map.Player.RigidBody.Position - from )* Kaneeth.VisionDistance;
+
+        Game.Map.RayCastEntity<Player>( Kaneeth, from, to, e => {
+            HasLineOfSight = true;
+        }, _ => HasLineOfSight = false );
+
+
+        PlayerVisible = PlayerInFOV && HasLineOfSight;
+    }
+
     public void Tick( float delta ) {
+
+        PlayerInFOV = IsInsideVision( Game.Map.Player.RigidBody.Position );
+
+        UpdateLineOfSight();
+
         UpdatePlayerLinearDistance();
 
         DebugVision();
 
-        PlayerInFOV = IsInsideVision( Game.Map.Player.RigidBody.Position );
+        Console.WriteLine( $"PlayerInFOV {PlayerInFOV} HasLineOfSight {HasLineOfSight}");
 
     }
-
 
     // --------------------------------- Debug --------------------------------- \\
 
 
     public void DebugVision() {
 
-        Vector3 origin = Kaneeth.RigidBody.Position;
-        Vector3 forward = Kaneeth.GetLookDirection();
-
-        Vector3 referenceUp = MathF.Abs( Vector3.Dot(forward, Vector3.UnitY)) > 0.999f? Vector3.UnitZ : Vector3.UnitY;
-
-        Vector3 right = Vector3.Normalize( Vector3.Cross(forward, referenceUp) );
-    
-        Vector3 up = Vector3.Normalize( Vector3.Cross(right, forward) );
+        Vector3 origin        = Kaneeth.RigidBody.Position;
+        Vector3 forward       = Kaneeth.GetLookDirection();
+        Vector3 referenceUp   = MathF.Abs( Vector3.Dot(forward, Vector3.UnitY)) > 0.999f? Vector3.UnitZ : Vector3.UnitY;
+        Vector3 right         = Vector3.Normalize( Vector3.Cross(forward, referenceUp) );
+        Vector3 up            = Vector3.Normalize( Vector3.Cross(right, forward) );
+        Vector3 previousPoint = Vector3.Zero;
 
         float halfAngle = Kaneeth.VisionAngle * 0.5f * ( MathF.PI / 180f );
-
-        Vector3 previousPoint = Vector3.Zero;
 
         for( int i = 0; i <= Kaneeth.VisionSegments; i++ ){
             float angle = (i / (float)Kaneeth.VisionSegments) * MathF.Tau;
 
-            Vector3 radial =
-                right * MathF.Cos(angle) +
-                up * MathF.Sin(angle);
+            Vector3 radial = right * MathF.Cos(angle) + up * MathF.Sin( angle );
 
-            Vector3 direction =
-                forward * MathF.Cos(halfAngle) +
-                radial * MathF.Sin(halfAngle);
+            Vector3 direction = forward * MathF.Cos( halfAngle ) + radial * MathF.Sin( halfAngle );
 
             Vector3 point = origin + direction * Kaneeth.VisionDistance;
 
@@ -110,5 +124,17 @@ public class PerceptronModule {
             origin + forward * Kaneeth.VisionDistance,
             Color.Green
         );
+
+        
+        Vector3 from = Kaneeth.RigidBody.Position;
+        Vector3 to = Game.Map.Player.RigidBody.Position - from;
+
+         Raylib.DrawLine3D(
+            from,
+            to * Kaneeth.VisionDistance,
+            Color.Green
+        );
+
     }
+
 }
