@@ -21,11 +21,8 @@ public class Light {
     public Vector3 Position = new();
 
     private Map Map;
-
     public Model Model;
-
     public Vector3 FadeColor = new();
-
 
     public Light( Map map ) {
         Map = map;
@@ -120,7 +117,7 @@ public class Light {
         Vector3 axis = Vector3.Cross(normal, direction);
         float axisLength = axis.Length();
 
-        if (axisLength < 0.001f) axis = Vector3.UnitX;
+        if( axisLength < 0.001f ) axis = Vector3.UnitX;
         else axis /= axisLength;
 
         float dot = Math.Clamp(Vector3.Dot(normal, direction), -1.0f, 1.0f);
@@ -130,14 +127,12 @@ public class Light {
         Rlgl.DisableDepthMask();
 
         Raylib.DrawModelEx( HaloModel, Position, axis, angle,
-            new Vector3(Radius, Radius, Radius),
+            new Vector3( Radius, Radius, Radius ),
             Color.White
         );
 
         Rlgl.EnableDepthMask();
         Raylib.EndBlendMode();
     }
-
-    
 
 }

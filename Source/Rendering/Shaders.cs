@@ -8,6 +8,7 @@ public class Shaders {
         Basic,
         Lighting,
         Halo,
+        Shadow
     }
 
     public static Shader Get( Name name ) {
@@ -36,8 +37,8 @@ public class Shaders {
         Dictionary< Name, string > l = new() {
             [ Name.Basic    ] = "Basic",
             [ Name.Lighting ] = "Lighting",
-            [ Name.Halo      ] = "Halo"
-
+            [ Name.Halo     ] = "Halo",
+            [ Name.Shadow   ] = "Shadow"
         };
 
         foreach( var e in l ) {
