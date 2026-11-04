@@ -11,10 +11,12 @@ public class Map {
     private List<Light> Lights = new();
     private List<Action> Actions = new();
 
-    public float Ambient = 0;//0.12f;
+    public float Ambient = 0; //0.12f;
 
     public Player Player;
     public Sun Sun;
+
+    public Shadows Shadows = new();
 
     public Map(){
 
@@ -28,14 +30,15 @@ public class Map {
 
         World.Gravity = new( 0, -5, 0 );
 
-        AddScene( new Enemy( this ).Configure<Enemy>( e => {
-            e.Model = Model3D.Get( Model3D.Names.Enemy );
-            e.RigidBody.Position = new( 0, 40, 0 );
-            e.RigidBody.AddShape( new BoxShape( 1 ) );
+        AddScene( new Kaneeth( this ).Configure<Kaneeth>( k => {
+            k.Model = Model3D.Get( Model3D.Names.Enemy );
+            k.RigidBody.Position = new( 0, 40, 0 );
+            k.RigidBody.AddShape( new BoxShape( 1 ) );
             Texture2D t = Texture.Get( Texture.Name.Missing );
-            Raylib.SetMaterialTexture(ref e.Material, MaterialMapIndex.Diffuse, t);
+            Raylib.SetMaterialTexture( ref k.Material, MaterialMapIndex.Diffuse, t );
 
         }));
+
 
         for( int i = 0; i < 10; i++ ) {
             
@@ -58,7 +61,9 @@ public class Map {
         }
 
         AddScene( new Object( this ).Configure<Object>( o => {
-            
+
+            o.SetGameType( GenericEntity.GameType.BaseGround );
+
             Vector3 size = new(50, 10, 50 );
 
             o.RigidBody.AddShape( new BoxShape( size ) );
@@ -170,7 +175,6 @@ public class Map {
         Actions.Add( () => Lights.Remove( l ) );
 
     }
-
     public void ExecuteActions() {
 
         foreach( Action action in Actions ) action();
@@ -243,18 +247,10 @@ public class Map {
 
         Step( delta );
 
-        // Player.Update( delta );
-
         Raylib.BeginMode3D( Player.Camera );
         {
-
-            //Raylib.DrawModel( planeModel, Vector3.Zero, 1.0f, Color.White );
-
             foreach( GenericEntity o in Scene ) o.Update( delta );
-            
             foreach( Light l in Lights ) l.Update( delta );
-
-
 
         }
         Raylib.EndMode3D();

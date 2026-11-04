@@ -21,6 +21,8 @@ public class Player : Entity {
 
     public Player( Map map ): base( map ) {
         
+        SetGameType( GameType.Player );
+
         RigidBody.SetMassInertia( 10 );
 
         PlayerController.Begin( this );

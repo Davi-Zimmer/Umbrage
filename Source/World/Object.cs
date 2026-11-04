@@ -11,8 +11,8 @@ public class Object: GenericEntity {
 
     public Object( Map map ): base( map ) {
 
-    
-
+        SetGameType( GameType.Prop );
+        
     }
 
     public override void Update( float delta ) {

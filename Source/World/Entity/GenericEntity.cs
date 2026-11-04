@@ -4,8 +4,19 @@ using Raylib_cs;
 
 public class GenericEntity {
 
-    public RigidBody RigidBody;
+    public enum GameType {
+        None,
+        BaseGround,
+        Kaneeth,
+        Player,
+        Prop
 
+    }
+
+    private GameType _Type = GameType.None;
+
+    public RigidBody RigidBody;
+    
     public Map Map;
 
     public GenericEntity( Map map ) {
@@ -15,7 +26,7 @@ public class GenericEntity {
         RigidBody = map.World.CreateRigidBody();
 
         PosConfig();
-
+        
     }
 
     public T Configure<T>( Action<T> cb ) where T: GenericEntity {
@@ -39,7 +50,6 @@ public class GenericEntity {
         Render();
 
     }
-
     public virtual void Tick( float dt ) {
         
     }
@@ -48,5 +58,16 @@ public class GenericEntity {
         
     }
 
+    public virtual void RenderMeshShadow( Material shadowMaterial ) {
+   
+    }
+
+    public GameType GetGameType() {
+       return _Type; 
+    }
+
+    public void SetGameType( GameType g ) {
+        _Type = g;
+    }
 
 }
