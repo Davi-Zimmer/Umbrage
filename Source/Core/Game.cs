@@ -8,6 +8,25 @@ public class Game {
 
     public static Map Map = new();
 
+    public static void Setup() {
+
+
+
+    }
+
+    public static void Load() {
+        Version.Load();
+        Texture.Load();
+        Shaders.Load();
+        Fonts.Load();
+    }
+
+    public static void Unload() {
+        Texture.UnLoad();
+        Shaders.Unload();
+        Fonts.Unload();
+    }
+
     public static Status status = Status.Running;
 
     public enum Status {
@@ -59,7 +78,7 @@ public class Game {
         
         Raylib.ClearBackground( Color.Black );
 
-        Raylib.DrawText( message, x, y, fontSize, new Color(
+        Utils.DrawText( message, x, y, fontSize, new Color(
             255, 255, 255, alpha.Value
         ));
 
@@ -75,7 +94,7 @@ public class Game {
 
         Raylib.ClearBackground( Color.White );
 
-        Raylib.DrawText( message, x, y, fontSize, Color.Black );
+        Utils.DrawText( message, x, y, fontSize, Color.Black );
     }
 
     private static void GetMiddleText( string s, int fontSize, out int x, out int y ) {
@@ -85,6 +104,12 @@ public class Game {
     }
 
     public static void Update() {
+
+        // Utils.DrawText( "Hello World!", 10, 20, 20, Color.White );
+        // Utils.DrawText( "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 10, 40, 20, Color.White );
+        // Utils.DrawText( "abcdefghijklmnopqrstuvwxyz", 10, 60, 20, Color.White );
+        // Utils.DrawText( "-+=/|\\{}()[]<>:;'`?!", 10, 80, 20, Color.White );
+
 
         switch( status ) {
             

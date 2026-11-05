@@ -1,15 +1,10 @@
-﻿Version.Load();
+﻿
+Game.Setup();
 
 Window.Config();
 
-Texture.Load();
-
-Shaders.Load();
-
-// Model3D.LoadModels();
+Game.Load();
 
 Window.StartUpdate( Game.Update );
 
-Texture.UnLoad();
-
-Shaders.Unload();
+Game.Unload();
