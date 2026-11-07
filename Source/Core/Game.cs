@@ -18,13 +18,13 @@ public class Game {
         Version.Load();
         Texture.Load();
         Shaders.Load();
-        Fonts.Load();
+        Letter.Load();
     }
 
     public static void Unload() {
         Texture.UnLoad();
         Shaders.Unload();
-        Fonts.Unload();
+        Letter.Unload();
     }
 
     public static Status status = Status.Running;
@@ -78,7 +78,7 @@ public class Game {
         
         Raylib.ClearBackground( Color.Black );
 
-        Utils.DrawText( message, x, y, fontSize, new Color(
+        Letter.DrawText( message, x, y, fontSize, new Color(
             255, 255, 255, alpha.Value
         ));
 
@@ -94,7 +94,7 @@ public class Game {
 
         Raylib.ClearBackground( Color.White );
 
-        Utils.DrawText( message, x, y, fontSize, Color.Black );
+        Letter.DrawText( message, x, y, fontSize, Color.Black );
     }
 
     private static void GetMiddleText( string s, int fontSize, out int x, out int y ) {
@@ -105,11 +105,12 @@ public class Game {
 
     public static void Update() {
 
-        // Utils.DrawText( "Hello World!", 10, 20, 20, Color.White );
-        // Utils.DrawText( "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 10, 40, 20, Color.White );
-        // Utils.DrawText( "abcdefghijklmnopqrstuvwxyz", 10, 60, 20, Color.White );
-        // Utils.DrawText( "-+=/|\\{}()[]<>:;'`?!", 10, 80, 20, Color.White );
-
+        // Letter.DrawText( "Hello World!", 10, 20, 20, Color.White );
+        // Letter.DrawText( "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 10, 50, 20, Color.White );
+        // Letter.DrawText( "abcdefghijklmnopqrstuvwxyz", 10, 80, 20, Color.White );
+        // Letter.DrawText( "-+=/|\\{}()[]<>:;'`?!", 10, 110, 20, Color.White );
+        // Letter.DrawText( "0123456789", 10, 130, 20, Color.White );
+        // return;
 
         switch( status ) {
             

@@ -230,20 +230,7 @@ public class Map {
             }, notFound );
 
         });
-        
-        /*
-        RayCast( from, to )
-        .Ignore( ignore.RigidBody )
-        .Then( shape => {
 
-            FindEntityByRigidBody<T>( shape.RigidBody, e => {
-
-                cb( e ); 
-
-            }, notFound );
-
-        });
-        */
 
     }
 

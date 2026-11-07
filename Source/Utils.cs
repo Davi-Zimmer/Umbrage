@@ -117,14 +117,5 @@ class Utils {
 
     }
 
-    public static void DrawTextEx( string text, Vector2 position, float fontSize, float spacing, Color color ) {
-        Raylib.DrawTextEx( Fonts.Default, text, position, fontSize, spacing, color  );
- 
-    }
-
-    public static void DrawText( string text, float x, float y, float fontSize, Color color ) {
-        Raylib.DrawTextEx( Fonts.Default, text, new( x, y ), fontSize, Fonts.Spacing, color );
-    }
-
 
 }

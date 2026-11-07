@@ -4,8 +4,7 @@ using Raylib_cs;
 public class Kaneeth: Enemy {
     public PerceptronModule Perceptron;
     public MemoryModule Memory;
-    public K_Brain      Brain;
-
+    public DecisionModule Decision;
     public float VisionAngle = 90f;
     public float VisionDistance = 15f;
     public int VisionSegments = 24;
@@ -29,8 +28,8 @@ public class Kaneeth: Enemy {
         });
 
         Perceptron = new( this );
-        Brain      = new( this );
         Memory     = new( this );
+        Decision   = new( this );
 
     }
 
